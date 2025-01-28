@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: src/
+      args:
+        PIP_REQUIREMENTS: requirements_dev.txt
+    ports:
+      - "8096:8000"
+    environment:
+      UWSGI_STATIC_MAP: "/brp_kennisgevingen/static=/static"
+      SECRET_KEY: insecure
+      CORS_ALLOW_ALL_ORIGINS: "${CORS_ALLOW_ALL_ORIGINS:-true}"
+      DJANGO_LOG_LEVEL: "${DJANGO_LOG_LEVEL:-INFO}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      AUDIT_LOG_LEVEL: "${AUDIT_LOG_LEVEL:-INFO}"
+      AZURE_APPI_AUDIT_CONNECTION_STRING: "${AZURE_APPI_AUDIT_CONNECTION_STRING:-}"
+      AZURE_APPI_CONNECTION_STRING: "${AZURE_APPI_CONNECTION_STRING:-}"
+      # Generated using: jq -c < src/jwks_test.json
+      PUB_JWKS: '{"keys":[{"kty":"EC","key_ops":["verify","sign"],"kid":"2aedafba-8170-4064-b704-ce92b7c89cc6","crv":"P-256","x":"6r8PYwqfZbq_QzoMA4tzJJsYUIIXdeyPA27qTgEJCDw=","y":"Cf2clfAfFuuCB06NMfIat9ultkMyrMQO9Hd2H7O9ZVE=","d":"N1vu0UQUp0vLfaNeM0EDbl4quvvL6m_ltjoAXXzkI3U="}]}'
+      OAUTH_JWKS_URL: "${OAUTH_JWKS_URL}"
+      CLOUD_ENV: "${CLOUD_ENV:-local}"
+      DJANGO_DEBUG: 1
+    volumes:
+      - ./src:/app
+    command: uwsgi --py-auto-reload=1 --enable-threads --lazy-apps --buffer-size=65535

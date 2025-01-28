@@ -1,0 +1,18 @@
+-r ./requirements.in
+
+# Packaging
+pur == 7.3.3
+pip-tools==7.4.1
+
+# Linting
+pre-commit==4.1.0
+black==24.10.0
+ruff==0.9.3
+
+# Testing
+pytest-sugar==1.0.0
+termcolor==2.5.0
+
+# Debugging
+django-debug-toolbar==5.0.1
+django-extensions==3.2.3
