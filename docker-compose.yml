@@ -1,4 +1,22 @@
 services:
+  database:
+    image: postgres:15
+    restart: always
+    user: postgres
+    shm_size: 128mb
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "$${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 20s
+    ports:
+      - "5416:5432"
+    environment:
+      POSTGRES_DB: brp_kennisgevingen
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: insecure
+    command: [ "postgres", "-c", "log_statement=all" ]
   web:
     build:
       context: src/
@@ -6,9 +24,15 @@ services:
         PIP_REQUIREMENTS: requirements_dev.txt
     ports:
       - "8096:8000"
+    links:
+      - database
+    depends_on:
+      database:
+        condition: service_healthy
     environment:
       UWSGI_STATIC_MAP: "/brp_kennisgevingen/static=/static"
       SECRET_KEY: insecure
+      DATABASE_URL: "${DATABASE_URL:-postgresql://postgres:insecure@database/brp_kennisgevingen}"
       CORS_ALLOW_ALL_ORIGINS: "${CORS_ALLOW_ALL_ORIGINS:-true}"
       DJANGO_LOG_LEVEL: "${DJANGO_LOG_LEVEL:-INFO}"
       LOG_LEVEL: "${LOG_LEVEL:-INFO}"
@@ -20,6 +44,9 @@ services:
       OAUTH_JWKS_URL: "${OAUTH_JWKS_URL}"
       CLOUD_ENV: "${CLOUD_ENV:-local}"
       DJANGO_DEBUG: 1
+      INITIALIZE_DB: "${INITIALIZE_DB:-true}"
     volumes:
       - ./src:/app
-    command: uwsgi --py-auto-reload=1 --enable-threads --lazy-apps --buffer-size=65535
+    command: >
+      /bin/bash -c "sh /app/initialize_db.sh
+      && uwsgi --py-auto-reload=1 --enable-threads --lazy-apps --buffer-size=65535"

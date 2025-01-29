@@ -100,7 +100,40 @@ ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
 CACHES = {"default": env.cache_url(default="locmemcache://")}
 
-DATABASES = {}
+if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
+    # On Azure, passwords are NOT passed via environment variables,
+    # because the container environment can be inspected, and those vars export to subprocesses.
+    pgpassword = Path(env.str("AZ_PG_TOKEN_PATH")).read_text()
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env.str("PGDATABASE"),
+            "USER": env.str("PGUSER"),
+            "PASSWORD": pgpassword,
+            "HOST": env.str("PGHOST"),
+            "PORT": env.str("PGPORT"),
+            "DISABLE_SERVER_SIDE_CURSORS": True,
+            "OPTIONS": {
+                "sslmode": env.str("PGSSLMODE", default="require"),
+            },
+        }
+    }
+    DATABASE_SET_ROLE = True
+else:
+    # Regular development
+    DATABASES = {
+        "default": env.db_url(
+            "DATABASE_URL",
+            default="postgres://dataservices:insecure@localhost:5416/brp_kennisgevingen",
+            engine="django.db.backends.postgresql",
+        ),
+    }
+    DATABASES["default"].setdefault("OPTIONS", {})
+    DATABASES["default"].setdefault("DISABLE_SERVER_SIDE_CURSORS", True)
+    DATABASE_SET_ROLE = env.bool("DATABASE_SET_ROLE", False)
+
+DATABASES["default"]["OPTIONS"]["application_name"] = "BRP-KENNISGEVINGEN-API"
 
 locals().update(env.email_url(default="smtp://"))
 
