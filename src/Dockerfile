@@ -17,6 +17,7 @@ FROM python:3.13-slim-bullseye
 RUN useradd -U -r brpkennisgevingenapi
 RUN apt update && apt install --no-install-recommends -y \
     curl \
+    libpq5 \
     netcat-openbsd
 
 # Copy python build artifacts from builder image
