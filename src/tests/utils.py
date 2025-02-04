@@ -27,7 +27,7 @@ def to_drf_request(api_request):
     return request
 
 
-def build_jwt_token(scopes, subject="text@example.com"):
+def build_jwt_token(scopes, subject="test@example.com"):
     now = int(time.time())
 
     kid = "2aedafba-8170-4064-b704-ce92b7c89cc6"

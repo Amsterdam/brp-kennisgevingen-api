@@ -4,12 +4,8 @@ from django.urls import include, path
 
 from . import views
 
-handler400 = views.bad_request
-handler404 = views.not_found
-handler500 = views.server_error
-
 urlpatterns = [
-    path("", views.RootView.as_view()),
+    path("status", views.RootView.as_view()),
 ]
 
 if settings.DEBUG:
