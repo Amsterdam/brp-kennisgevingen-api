@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.views import exception_handler as drf_exception_handler
 
+from brp_kennisgevingen.api.exceptions import ProblemJsonException
+
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
     status.HTTP_403_FORBIDDEN: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
@@ -43,7 +45,25 @@ def exception_handler(exc, context):
     # so it remains text/html for the browsable API. It would break browsing otherwise.
     response.content_type = "application/problem+json"
 
-    if isinstance(response.data.get("detail"), ErrorDetail):
+    if isinstance(exc, ProblemJsonException):
+        # Raw problem json response forwarded.
+        # Normalize the problem+json fields to be identical to how
+        # our own API's would return these.
+        normalized_fields = {
+            "type": STATUS_TO_URI.get(exc.status_code),
+            "title": str(exc.title),
+            "status": int(exc.status_code),
+            "detail": exc.detail if isinstance(exc.detail, list | dict) else str(exc.detail),
+            "code": str(exc.code),
+            "instance": request.path if request else None,
+        }
+        if exc.invalid_params is not None:
+            normalized_fields["invalidParams"] = exc.invalid_params
+
+        # This merge strategy puts the normal fields first:
+        response.data.update(normalized_fields)
+        response.status_code = int(exc.status_code)
+    elif isinstance(response.data.get("detail"), ErrorDetail):
         # DRF parsed the exception as API
         detail: ErrorDetail = response.data["detail"]
         default_detail = getattr(exc, "default_detail", None)
