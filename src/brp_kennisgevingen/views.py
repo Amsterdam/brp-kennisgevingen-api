@@ -1,10 +1,10 @@
-import sys
-
 from django.http import JsonResponse
 from django.views import View
 from rest_framework import status
-from rest_framework.exceptions import APIException, ErrorDetail
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.views import exception_handler as drf_exception_handler
+
+from brp_kennisgevingen.api.exceptions import ProblemJsonException
 
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
@@ -19,7 +19,7 @@ STATUS_TO_URI = {
 
 
 class RootView(View):
-    """Root page of the server."""
+    """Status page of the server."""
 
     def get(self, request, *args, **kwargs):
         return JsonResponse({"status": "online"})
@@ -45,7 +45,25 @@ def exception_handler(exc, context):
     # so it remains text/html for the browsable API. It would break browsing otherwise.
     response.content_type = "application/problem+json"
 
-    if isinstance(response.data.get("detail"), ErrorDetail):
+    if isinstance(exc, ProblemJsonException):
+        # Raw problem json response forwarded.
+        # Normalize the problem+json fields to be identical to how
+        # our own API's would return these.
+        normalized_fields = {
+            "type": STATUS_TO_URI.get(exc.status_code),
+            "title": str(exc.title),
+            "status": int(exc.status_code),
+            "detail": exc.detail if isinstance(exc.detail, list | dict) else str(exc.detail),
+            "code": str(exc.code),
+            "instance": request.path if request else None,
+        }
+        if exc.invalid_params is not None:
+            normalized_fields["invalidParams"] = exc.invalid_params
+
+        # This merge strategy puts the normal fields first:
+        response.data.update(normalized_fields)
+        response.status_code = int(exc.status_code)
+    elif isinstance(response.data.get("detail"), ErrorDetail):
         # DRF parsed the exception as API
         detail: ErrorDetail = response.data["detail"]
         default_detail = getattr(exc, "default_detail", None)
@@ -63,59 +81,3 @@ def exception_handler(exc, context):
         response.content_type = "application/json; charset=utf-8"
 
     return response
-
-
-def server_error(request, *args, **kwargs):
-    """
-    Generic 500 error handler.
-    """
-    # If this is an API error (e.g. due to delayed rendering by streaming)
-    # redirect the handling back to the DRF exception handler.
-    type, value, traceback = sys.exc_info()
-    if issubclass(type, APIException):
-        # DRF responses follow the logic of TemplateResponse, with delegates rendering
-        # to separate classes. At this level, avoid such complexity:
-        drf_response = drf_exception_handler(value, context={"request": request})
-        return JsonResponse(
-            drf_response.data,
-            status=drf_response.status_code,
-            reason=drf_response.reason_phrase,
-            content_type=drf_response.content_type,
-        )
-
-    data = {
-        "type": STATUS_TO_URI[status.HTTP_500_INTERNAL_SERVER_ERROR],
-        "title": "Server Error (500)",
-        "detail": "",
-        "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "instance": _get_unique_trace_id(request),
-    }
-    return JsonResponse(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-def bad_request(request, exception, *args, **kwargs):
-    """
-    Generic 400 error handler.
-    """
-    data = {
-        "type": STATUS_TO_URI[status.HTTP_400_BAD_REQUEST],
-        "title": "Bad Request (400)",
-        "detail": "",
-        "status": status.HTTP_400_BAD_REQUEST,
-        "instance": _get_unique_trace_id(request),
-    }
-    return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
-
-
-def not_found(request, exception, *args, **kwargs):
-    """
-    Generic 404 error handler.
-    """
-    data = {
-        "type": STATUS_TO_URI[status.HTTP_404_NOT_FOUND],
-        "title": "Not Found (404)",
-        "detail": "",
-        "status": status.HTTP_404_NOT_FOUND,
-        "instance": _get_unique_trace_id(request),
-    }
-    return JsonResponse(data, status=status.HTTP_404_NOT_FOUND)

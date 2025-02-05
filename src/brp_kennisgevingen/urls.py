@@ -2,14 +2,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
+import brp_kennisgevingen.api.urls
+
 from . import views
 
-handler400 = views.bad_request
-handler404 = views.not_found
-handler500 = views.server_error
-
 urlpatterns = [
-    path("", views.RootView.as_view()),
+    path("", include(brp_kennisgevingen.api.urls)),
+    path("status", views.RootView.as_view()),
 ]
 
 if settings.DEBUG:

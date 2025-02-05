@@ -89,8 +89,7 @@ extend-function-names = ["gettext_lazy", "ngettext_lazy", "pgettext", "pgettext_
 "django.utils.timezone.make_aware".msg = "There is no need for make_aware(), pass tzinfo directly."
 
 [tool.ruff.lint.isort]
-known-first-party = ["dso_api", "rest_framework_dso", "tests"]
-known-third-party = ["gisserver", "schematools"]
+known-first-party = ["brp_kennisgevingen", "tests"]
 #required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.mccabe]
