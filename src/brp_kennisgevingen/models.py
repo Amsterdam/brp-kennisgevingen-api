@@ -21,7 +21,7 @@ class SubscriptionManager(models.Manager):
 
     def active(self):
         today = timezone.now().date()
-        return self.filter(end_date__gte=today)
+        return self.filter(end_date__gt=today)
 
     def create_with_bsn(self, application_id: str, bsn: str, start_date: date, end_date: date):
         bsn_instance, _ = BSNMutation.objects.get_or_create(bsn=bsn)
