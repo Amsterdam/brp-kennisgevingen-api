@@ -91,6 +91,36 @@ def subscriptions() -> list[Subscription]:
 
 
 @pytest.fixture()
+def subscription_today() -> list[Subscription]:
+    """
+    Create an inactive subscription because it expires 'today'
+    """
+    today = timezone.now().date()
+    subscription = {
+        "application_id": "test@example.com",
+        "bsn": "999990093",
+        "start_date": today - timedelta(days=30),
+        "end_date": today,
+    }
+    return Subscription.objects.create_with_bsn(**subscription)
+
+
+@pytest.fixture()
+def subscription_past() -> list[Subscription]:
+    """
+    Create an inactive subscription because it expired 10 days ago
+    """
+    today = timezone.now().date()
+    subscription = {
+        "application_id": "test@example.com",
+        "bsn": "999990093",
+        "start_date": today - timedelta(days=30),
+        "end_date": today - timedelta(days=10),
+    }
+    return Subscription.objects.create_with_bsn(**subscription)
+
+
+@pytest.fixture()
 def new_residents() -> list[NewResident]:
     """
     Creates four new residents:
@@ -98,7 +128,7 @@ def new_residents() -> list[NewResident]:
     - One without a mutation_date set
     - One with a mutation date in the future
     """
-    today = timezone.now().date()
+    today = timezone.now()
 
     new_residents = [
         {

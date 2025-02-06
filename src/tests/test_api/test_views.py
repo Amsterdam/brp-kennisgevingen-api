@@ -85,7 +85,40 @@ class TestSubscriptionsView:
         # We expect two records, since the other subscriptions are either inactive
         # or linked to another application_id
         assert len(response.data) == 2
-        assert response.data[0]["burgerservicenummer"] == "999990019"
+        for record in response.data:
+            assert record["burgerservicenummer"] in ["999990019", "999990093"]
+
+    @pytest.mark.django_db
+    def test_subscriptions_ending_today_are_not_returned(self, api_client, subscription_today):
+        url = reverse("subscriptions-list")
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties",
+            ]
+        )
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+
+        # We expect no records, since the end_date is today
+        assert len(response.data) == 0
+
+    @pytest.mark.django_db
+    def test_subscriptions_ended_are_not_returned(self, api_client, subscription_past):
+        url = reverse("subscriptions-list")
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties",
+            ]
+        )
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+
+        # We expect no records, since the end_date is today
+        assert len(response.data) == 0
 
     @pytest.mark.django_db
     def test_subscriptions_detail_exists(self, api_client, subscriptions):
@@ -375,8 +408,8 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_mutation_date_within_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now().date() - timedelta(days=10)
-        url += f"?vanaf={start_date}"
+        start_date = timezone.now() - timedelta(days=10)
+        url += f"?vanaf={start_date.date()}"
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
@@ -399,8 +432,8 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_mutation_date_outside_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now().date() - timedelta(days=10)
-        url += f"?vanaf={start_date}"
+        start_date = timezone.now() - timedelta(days=10)
+        url += f"?vanaf={start_date.date()}"
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
@@ -423,8 +456,8 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_mutation_date_in_future(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now().date() - timedelta(days=10)
-        url += f"?vanaf={start_date}"
+        start_date = timezone.now() - timedelta(days=10)
+        url += f"?vanaf={start_date.date()}"
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
@@ -447,8 +480,8 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_new_resident_in_search_window(self, api_client, new_residents):
         url = reverse("new-residents-list")
-        start_date = timezone.now().date() - timedelta(days=15)
-        url += f"?vanaf={start_date}"
+        start_date = timezone.now() - timedelta(days=15)
+        url += f"?vanaf={start_date.date()}"
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
