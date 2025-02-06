@@ -176,7 +176,7 @@ class UpdatesAPIBaseView(BaseAPIView):
 
 class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     queryset = Subscription.objects.active()
-    bsn_field: str = "bsn__bsn"
+    bsn_field: str = "bsn_id"
     mutation_date_field: str = "bsn__mutation_date"
 
 

@@ -10,7 +10,7 @@ class BSNMutation(models.Model):
     an external process.
     """
 
-    bsn = models.CharField(max_length=9, unique=True)
+    bsn = models.CharField(max_length=9, unique=True, primary_key=True)
     mutation_date = models.DateTimeField(null=True)
 
     def __str__(self):
@@ -79,7 +79,7 @@ class NewResident(models.Model):
     Could be newborns, movers or deceased
     """
 
-    bsn = models.CharField(max_length=9, unique=True)
+    bsn = models.CharField(max_length=9, unique=True, primary_key=True)
     mutation_date = models.DateTimeField(null=True)
 
     def __str__(self):
