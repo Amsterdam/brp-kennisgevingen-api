@@ -1,0 +1,42 @@
+name: Validate openapi spec
+
+on:
+  push:
+    branches:
+    - features/**
+  pull_request:
+    branches:
+    - main
+    - master
+
+jobs:
+  docker:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Start containers
+      run: docker compose up -d --build
+
+    - name: Setup tests
+      run: |
+        mkdir spectral
+        # Create spectral config file
+        echo 'extends: ["spectral:oas", "https://developer.overheid.nl/static/adr/ruleset.yaml"]' > ./spectral/.spectral.yaml
+
+        # Give the API time to start
+        sleep 5
+        docker compose logs web
+
+        # Grab openapi yaml for bag dataset
+        docker compose exec web curl 'http://web:8000/openapi.yaml'  > ./spectral/openapi.yaml
+
+    - name: Run spectral tests
+      run: docker run -v ./spectral:/mnt/spectral stoplight/spectral lint /mnt/spectral/openapi.yaml --ruleset /mnt/spectral/.spectral.yaml
+
+    - name: Stop containers
+      if: always()
+      run: docker compose down
