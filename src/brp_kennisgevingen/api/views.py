@@ -1,12 +1,14 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema_view
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from brp_kennisgevingen.models import NewResident, Subscription, SubscriptionTooLongException
+from brp_kennisgevingen.openapi import schema
 
 from . import permissions
 from .exceptions import ProblemJsonException, raise_serializer_validation_error
@@ -43,13 +45,22 @@ class SubscriptionAppIDFilterMixin:
         return self.queryset.filter(application_id=self.application_id)
 
 
+@extend_schema_view(get=schema.list_subscriptions_schema)
 class SubscriptionListAPIView(SubscriptionAppIDFilterMixin, ListAPIView, BaseAPIView):
+    """
+    List all active subscriptions for an application user.
+    """
+
     serializer_class = SubscriptionSerializer
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    get=schema.get_subscription_schema,
+    put=schema.put_subscription_schema,
+)
 class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, BaseAPIView):
     http_method_names: list[str] = ["get", "put"]
     lookup_field: str = "bsn"
@@ -160,7 +171,7 @@ class UpdatesAPIBaseView(BaseAPIView):
         start_date = query_serializer.validated_data["vanaf"]
         filter_kwargs = {
             f"{self.mutation_date_field}__gte": start_date,
-            f"{self.mutation_date_field}__lte": timezone.now(),
+            f"{self.mutation_date_field}__lt": timezone.now(),
         }
 
         queryset = queryset.filter(**filter_kwargs)
@@ -168,17 +179,27 @@ class UpdatesAPIBaseView(BaseAPIView):
         serializer = UpdatesSerializer(
             {
                 "burgerservicenummers": queryset.values_list(self.bsn_field, flat=True),
-                "self": request.get_full_path(),
+                "full_path": self.request.get_full_path(),
             }
         )
         return Response(serializer.data)
 
 
+@extend_schema_view(get=schema.list_updates_schema)
 class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
+    """
+    Request a list of `burgerservicenummers` of persons with updated data.
+    """
+
     queryset = Subscription.objects.active()
     bsn_field: str = "bsn_id"
     mutation_date_field: str = "bsn__mutation_date"
 
 
+@extend_schema_view(get=schema.list_updates_schema)
 class NewResidentsListAPIView(UpdatesAPIBaseView):
+    """
+    Request a list of `burgerservicenummers` of new residents.
+    """
+
     queryset = NewResident.objects.all()
