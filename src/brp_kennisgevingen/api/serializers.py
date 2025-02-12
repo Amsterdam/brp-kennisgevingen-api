@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 
@@ -40,6 +41,7 @@ class UpdatesSerializer(serializers.Serializer):
     burgerservicenummers = serializers.ListField(child=serializers.CharField())
     _links = serializers.SerializerMethodField()
 
+    @extend_schema_field(UpdatesLinksSerializer)
     def get__links(self, obj):
         return UpdatesLinksSerializer(
             {
