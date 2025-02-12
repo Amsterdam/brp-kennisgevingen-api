@@ -8,9 +8,11 @@ from brp_kennisgevingen.api.exceptions import ProblemJsonException
 
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+    status.HTTP_401_UNAUTHORIZED: "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
     status.HTTP_403_FORBIDDEN: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
     status.HTTP_404_NOT_FOUND: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
     status.HTTP_405_METHOD_NOT_ALLOWED: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.5",
+    status.HTTP_406_NOT_ACCEPTABLE: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.6",
     status.HTTP_500_INTERNAL_SERVER_ERROR: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
     status.HTTP_502_BAD_GATEWAY: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.3",
     status.HTTP_503_SERVICE_UNAVAILABLE: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.4",

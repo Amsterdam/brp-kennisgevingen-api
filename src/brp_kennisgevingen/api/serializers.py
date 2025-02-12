@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.utils import timezone
 from rest_framework import serializers
@@ -24,18 +24,34 @@ class UpdateSubscriptionSerializer(serializers.Serializer):
         return value
 
 
+class HalLinkSerializer(serializers.Serializer):
+    description = serializers.CharField(required=False)
+    href = serializers.CharField()
+    templated = serializers.BooleanField(required=False)
+    title = serializers.CharField(required=False)
+
+
+class UpdatesLinksSerializer(serializers.Serializer):
+    self = HalLinkSerializer()
+    ingeschrevenPersoon = HalLinkSerializer()
+
+
 class UpdatesSerializer(serializers.Serializer):
     burgerservicenummers = serializers.ListField(child=serializers.CharField())
     _links = serializers.SerializerMethodField()
 
     def get__links(self, obj):
-        return {
-            "self": {"href": obj["self"]},
-            "ingeschrevenPersoon": {
-                "href": "/ingeschrevenpersonen/{burgerservicenummer}",
-                "templated": True,
-            },
-        }
+        return UpdatesLinksSerializer(
+            {
+                "self": HalLinkSerializer({"href": obj["full_path"]}).data,
+                "ingeschrevenPersoon": HalLinkSerializer(
+                    {
+                        "href": "/ingeschrevenpersonen/{burgerservicenummer}",
+                        "templated": True,
+                    }
+                ).data,
+            }
+        ).data
 
 
 class DateInputSerializer(serializers.Serializer):
@@ -45,4 +61,7 @@ class DateInputSerializer(serializers.Serializer):
         today = timezone.now().date()
         if value > today:
             raise serializers.ValidationError("Vanaf moet in het verleden liggen.")
-        return value
+        # Return a timezone aware datetime
+        return datetime.combine(value, datetime.min.time()).replace(
+            tzinfo=timezone.get_current_timezone()
+        )

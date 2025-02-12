@@ -23,18 +23,20 @@ class TestBaseView:
     def test_no_login(self, api_client, url):
         """Prove that accessing the view fails without a login token."""
         response = api_client.get(url)
-        assert response.status_code == 403
+        assert response.status_code == 401
         assert response.data == {
-            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
             "code": "not_authenticated",
-            "title": "Authentication credentials were not provided.",
-            "detail": "",
-            "status": 403,
+            "title": "Not authenticated.",
+            "detail": "The request requires user authentication. The response MUST include a "
+            "WWW-Authenticate header field (section 14.47) containing a challenge "
+            "applicable to the requested resource.",
+            "status": 401,
             "instance": url,
         }
 
-    def test_invalid_api_key(self, api_client):
-        """Prove that incorrect API-key settings are handled."""
+    def test_insufficient_scopes(self, api_client):
+        """Prove that insufficient scopes are handled."""
         url = reverse("subscriptions-list")
         token = build_jwt_token(
             [
@@ -43,12 +45,12 @@ class TestBaseView:
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 403
-        assert response.json() == {
+        assert response.data == {
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
-            "title": "Authentication credentials were not provided.",
+            "title": "You do not have permission to perform this action.",
             "status": 403,
             "detail": "",
-            "code": "not_authenticated",
+            "code": "permission_denied",
             "instance": "/volgindicaties",
         }
 

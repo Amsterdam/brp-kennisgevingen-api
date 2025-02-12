@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import environ
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import json
 
 env = environ.Env()
 _USE_SECRET_STORE = Path("/mnt/secrets-store").exists()
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "brp_kennisgevingen",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -46,6 +47,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "brp_kennisgevingen.api.middleware.APIVersionMiddleware",
     "authorization_django.authorization_middleware",
 ]
 
@@ -140,7 +142,7 @@ locals().update(env.email_url(default="smtp://"))
 # -- Logging
 
 
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
+class CustomJsonFormatter(json.JsonFormatter):
     def __init__(self, *args, **kwargs):
         # Make sure some 'extra' fields are not included:
         super().__init__(*args, **kwargs)
@@ -335,7 +337,33 @@ REST_FRAMEWORK = dict(
     UNAUTHENTICATED_USER=None,  # Avoid importing django.contrib.auth.models
     UNAUTHENTICATED_TOKEN=None,
     URL_FORMAT_OVERRIDE="_format",  # use ?_format=.. instead of ?format=..
+    DEFAULT_SCHEMA_CLASS="brp_kennisgevingen.openapi.schema.AutoSchema",
+    DEFAULT_AUTHENTICATION_CLASSES=[],
 )
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "BRP Kennisgevingen API",
+    "DESCRIPTION": "BRP Kennisgevingen API",
+    "CONTACT": {"email": "datapunt@amsterdam.nl"},
+    "VERSION": "1.0.0",
+    "LICENSE": {
+        "name": "European Union Public License, version 1.2 (EUPL-1.2)",
+        "url": "https://eupl.eu/1.2/nl/",
+    },
+    "AUTHENTICATION_WHITELIST": None,
+    "PREPROCESSING_HOOKS": [
+        "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
+    ],
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "JWTAuthentication": {"type": "apiKey", "in": "header", "name": "Authorization"}
+        }
+    },
+    "TAGS": [
+        {"name": "Manage subscriptions"},
+        {"name": "List updates"},
+    ],
+}
 
 # -- Amsterdam oauth settings
 
@@ -345,5 +373,5 @@ DATAPUNT_AUTHZ = {
     "JWKS_URL": env.str("OAUTH_JWKS_URL", None),
     # "ALWAYS_OK": True if DEBUG else False,
     "ALWAYS_OK": False,
-    "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes
+    "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes,
 }

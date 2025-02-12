@@ -1,6 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
+from drf_spectacular.views import (
+    SpectacularJSONAPIView,
+    SpectacularSwaggerView,
+    SpectacularYAMLAPIView,
+)
 
 import brp_kennisgevingen.api.urls
 
@@ -9,6 +14,9 @@ from . import views
 urlpatterns = [
     path("", include(brp_kennisgevingen.api.urls)),
     path("status", views.RootView.as_view()),
+    path("swagger/", SpectacularSwaggerView.as_view(url_name="schema-json"), name="swagger-ui"),
+    path("openapi.json", SpectacularJSONAPIView.as_view(), name="schema-json"),
+    path("openapi.yml", SpectacularYAMLAPIView.as_view(), name="schema-yml"),
 ]
 
 if settings.DEBUG:

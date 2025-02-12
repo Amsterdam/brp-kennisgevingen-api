@@ -1,6 +1,9 @@
 from rest_framework import exceptions, status
 
-CLASS_BY_CODE = {e.status_code: e for e in (exceptions.ParseError, exceptions.NotFound)}
+CLASS_BY_CODE = {
+    e.status_code: e
+    for e in (exceptions.ParseError, exceptions.NotFound, exceptions.NotAuthenticated)
+}
 
 
 class ProblemJsonException(exceptions.APIException):
