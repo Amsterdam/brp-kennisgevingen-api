@@ -91,7 +91,7 @@ def subscriptions() -> list[Subscription]:
 
 
 @pytest.fixture()
-def subscription_today() -> list[Subscription]:
+def subscription_today() -> Subscription:
     """
     Create an inactive subscription because it expires 'today'
     """
@@ -106,7 +106,7 @@ def subscription_today() -> list[Subscription]:
 
 
 @pytest.fixture()
-def subscription_past() -> list[Subscription]:
+def subscription_past() -> Subscription:
     """
     Create an inactive subscription because it expired 10 days ago
     """
