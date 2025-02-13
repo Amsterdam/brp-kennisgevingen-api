@@ -1,7 +1,4 @@
-from rest_framework import status
 from rest_framework.permissions import BasePermission
-
-from brp_kennisgevingen.api.exceptions import ProblemJsonException
 
 
 class IsUserScope(BasePermission):
@@ -16,17 +13,6 @@ class IsUserScope(BasePermission):
         # This is solely done to avoid incorrect log messages of "access granted",
         # because additional checks may still deny access.
         user_scopes = set(request.get_token_scopes)
-
-        # Workaround for catching not authenticated since authorization_django middleware
-        # either returns a basic response or doesn't handle not authenticated
-        if not user_scopes and not request.get_token_subject:
-            raise ProblemJsonException(
-                title="Not authenticated.",
-                detail="The request requires user authentication. The response MUST include a "
-                "WWW-Authenticate header field (section 14.47) containing a challenge "
-                "applicable to the requested resource.",
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
 
         if user_scopes.issuperset(self.needed_scopes):
             return True

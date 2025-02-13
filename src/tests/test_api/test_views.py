@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import pytest
 from django.urls import reverse
@@ -221,9 +221,7 @@ class TestSubscriptionsView:
             ]
         )
 
-        today = timezone.now().date()
-
-        data = {"einddatum": today - timedelta(days=30)}
+        data = {"einddatum": timezone.now().date() - timedelta(days=30)}
 
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 400
@@ -258,9 +256,7 @@ class TestSubscriptionsView:
             ]
         )
 
-        today = timezone.now().date()
-
-        data = {"einddatum": today + timedelta(days=184)}
+        data = {"einddatum": timezone.now().date() + timedelta(days=184)}
 
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 400
@@ -315,13 +311,13 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_hal_json_response(self, api_client, url, subscriptions, new_residents):
         start_date = timezone.now().date() - timedelta(days=15)
-        url += f"?vanaf={start_date}"
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/hal+json"
@@ -361,13 +357,13 @@ class TestUpdateViews:
     def test_no_subscriptions_returns_empty_array(self, api_client):
         url = reverse("updates-list")
         today = timezone.now().date()
-        url += f"?vanaf={today}"
+        query_params = {"vanaf": today}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert response.data == {
@@ -387,13 +383,13 @@ class TestUpdateViews:
     ):
         url = reverse("updates-list")
         start_date = timezone.now().date() - timedelta(days=10)
-        url += f"?vanaf={start_date}"
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert response.data == {
@@ -410,86 +406,95 @@ class TestUpdateViews:
     @pytest.mark.django_db
     def test_mutation_date_within_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now() - timedelta(days=10)
-        url += f"?vanaf={start_date.date()}"
+        start_date = timezone.now().date() - timedelta(days=10)
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
         bsn_mutation = subscriptions[0].bsn
-        bsn_mutation.mutation_date = start_date + timedelta(days=3)
+        timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
+            tzinfo=timezone.get_current_timezone()
+        )
+        bsn_mutation.mutation_date = timezone_aware_start_date + timedelta(days=3)
         bsn_mutation.save()
 
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 1
 
     @pytest.mark.django_db
     def test_mutation_date_outside_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now() - timedelta(days=10)
-        url += f"?vanaf={start_date.date()}"
+        start_date = timezone.now().date() - timedelta(days=10)
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
         bsn_mutation = subscriptions[0].bsn
-        bsn_mutation.mutation_date = start_date - timedelta(days=3)
+        timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
+            tzinfo=timezone.get_current_timezone()
+        )
+        bsn_mutation.mutation_date = timezone_aware_start_date - timedelta(days=3)
         bsn_mutation.save()
 
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
     def test_mutation_date_in_future(self, api_client, subscriptions):
         url = reverse("updates-list")
-        start_date = timezone.now() - timedelta(days=10)
-        url += f"?vanaf={start_date.date()}"
+        start_date = timezone.now().date() - timedelta(days=10)
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
         bsn_mutation = subscriptions[0].bsn
-        bsn_mutation.mutation_date = start_date + timedelta(days=15)
+        timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
+            tzinfo=timezone.get_current_timezone()
+        )
+        bsn_mutation.mutation_date = timezone_aware_start_date + timedelta(days=15)
         bsn_mutation.save()
 
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
     def test_new_resident_in_search_window(self, api_client, new_residents):
         url = reverse("new-residents-list")
-        start_date = timezone.now() - timedelta(days=15)
-        url += f"?vanaf={start_date.date()}"
+        start_date = timezone.now().date() - timedelta(days=15)
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 1
@@ -498,13 +503,13 @@ class TestUpdateViews:
     def test_new_resident_outside_search_window(self, api_client, new_residents):
         url = reverse("new-residents-list")
         start_date = timezone.now().date()
-        url += f"?vanaf={start_date}"
+        query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties",
             ]
         )
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0

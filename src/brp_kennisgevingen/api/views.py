@@ -25,6 +25,23 @@ from .utils import is_valid_bsn
 class BaseAPIView(APIView):
     needed_scopes: set = {"benk-brp-volgindicaties"}
 
+    def perform_authentication(self, request):
+        """
+        Perform authentication on the incoming request.
+
+        If we do not have a token subject and no token scopes we assume the user is not
+        authenticated. The authorization_django middleware either returns a basic response
+        or doesn't handle not authenticated
+        """
+        if not request.get_token_scopes and not request.get_token_subject:
+            raise ProblemJsonException(
+                title="Not authenticated.",
+                detail="The request requires user authentication. The response MUST include a "
+                "WWW-Authenticate header field (section 14.47) containing a challenge "
+                "applicable to the requested resource.",
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
     def get_permissions(self):
         """Collect the DRF permission checks.
         DRF checks these in the initial() method, and will block view access
@@ -179,7 +196,13 @@ class UpdatesAPIBaseView(BaseAPIView):
         serializer = UpdatesSerializer(
             {
                 "burgerservicenummers": queryset.values_list(self.bsn_field, flat=True),
-                "full_path": self.request.get_full_path(),
+                "_links": {
+                    "self": {"href": self.request.get_full_path()},
+                    "ingeschrevenPersoon": {
+                        "href": "/ingeschrevenpersonen/{burgerservicenummer}",
+                        "templated": True,
+                    },
+                },
             }
         )
         return Response(serializer.data)
