@@ -27,7 +27,9 @@ jobs:
         # Create spectral config file
         echo 'extends: ["spectral:oas", "https://developer.overheid.nl/static/adr/ruleset.yaml"]' > ./spectral/.spectral.yaml
 
-        docker compose exec web curl -q -o /dev/null --silent --retry-connrefused --retry 5 --retry-delay 1 --fail 'http://web:8000/openapi.yaml'  > ./spectral/openapi.yaml
+        docker compose exec web curl -q -o /dev/null --silent --retry-connrefused --retry 5 --retry-delay 1 --fail http://web:8000/status
+
+        docker compose exec web curl 'http://web:8000/openapi.yaml'  > ./spectral/openapi.yaml
 
     - name: Run spectral tests
       run: docker run -v ./spectral:/mnt/spectral stoplight/spectral lint /mnt/spectral/openapi.yaml --ruleset /mnt/spectral/.spectral.yaml

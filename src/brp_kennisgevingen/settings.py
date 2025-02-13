@@ -373,5 +373,5 @@ DATAPUNT_AUTHZ = {
     "JWKS_URL": env.str("OAUTH_JWKS_URL", None),
     # "ALWAYS_OK": True if DEBUG else False,
     "ALWAYS_OK": False,
-    "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes,
+    "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes
 }
