@@ -26,8 +26,8 @@ class TestBaseView:
         assert response.status_code == 401
         assert response.data == {
             "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
-            "code": "not_authenticated",
-            "title": "Not authenticated.",
+            "code": "notAuthenticated",
+            "title": "Authentication credentials were not provided.",
             "detail": "The request requires user authentication. The response MUST include a "
             "WWW-Authenticate header field (section 14.47) containing a challenge "
             "applicable to the requested resource.",
@@ -50,7 +50,7 @@ class TestBaseView:
             "title": "You do not have permission to perform this action.",
             "status": 403,
             "detail": "",
-            "code": "permission_denied",
+            "code": "permissionDenied",
             "instance": "/volgindicaties",
         }
 
@@ -153,7 +153,7 @@ class TestSubscriptionsView:
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
             "title": "Opgevraagde resource bestaat niet.",
             "status": 404,
-            "code": "not_found",
+            "code": "notFound",
             "instance": "/volgindicaties/999990147",
         }
 
@@ -175,7 +175,7 @@ class TestSubscriptionsView:
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
             "title": "Waarde is geen geldig BSN.",
             "status": 400,
-            "code": "parse_error",
+            "code": "parseError",
             "instance": "/volgindicaties/invalid",
             "invalidParams": [
                 {
@@ -231,7 +231,7 @@ class TestSubscriptionsView:
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
             "title": "Geen correcte waarde opgegeven.",
             "status": 400,
-            "code": "parse_error",
+            "code": "parseError",
             "instance": "/volgindicaties/999990019",
             "invalidParams": [
                 {
@@ -266,7 +266,7 @@ class TestSubscriptionsView:
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
             "title": "Geen correcte waarde opgegeven.",
             "status": 400,
-            "code": "parse_error",
+            "code": "parseError",
             "instance": "/volgindicaties/999990019",
             "invalidParams": [
                 {
@@ -337,7 +337,7 @@ class TestUpdateViews:
 
         assert response.status_code == 400
         assert response.data == {
-            "code": "parse_error",
+            "code": "parseError",
             "detail": "The request could not be understood by the server due to malformed "
             "syntax. The client SHOULD NOT repeat the request without modification.",
             "status": 400,
