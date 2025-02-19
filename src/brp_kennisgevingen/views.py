@@ -32,6 +32,12 @@ def _get_unique_trace_id(request):
     return f"X-Unique-ID:{unique_id}" if unique_id else request.build_absolute_uri()
 
 
+def _to_camel_case(snake_str):
+    """Simple to-camel-case, taken from DRF."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
 def exception_handler(exc, context):
     """Return the exceptions as 'application/problem+json'.
 
@@ -56,7 +62,9 @@ def exception_handler(exc, context):
             "title": str(exc.title),
             "status": int(exc.status_code),
             "detail": exc.detail if isinstance(exc.detail, list | dict) else str(exc.detail),
-            "code": str(exc.code),
+            "code": _to_camel_case(
+                str(exc.code),
+            ),  # permission_denied -> permissionDenied
             "instance": request.path if request else None,
         }
         if exc.invalid_params is not None:
@@ -71,7 +79,7 @@ def exception_handler(exc, context):
         default_detail = getattr(exc, "default_detail", None)
         response.data = {
             "type": STATUS_TO_URI.get(exc.status_code),
-            "code": detail.code,
+            "code": _to_camel_case(detail.code),  # permission_denied -> permissionDenied
             "title": default_detail if default_detail else str(exc),
             "detail": str(detail) if detail != default_detail else "",
             "status": response.status_code,
