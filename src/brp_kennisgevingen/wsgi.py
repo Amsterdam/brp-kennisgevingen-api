@@ -1,5 +1,5 @@
 """
-WSGI config for haal_centraal_proxy project.
+WSGI config for BRP Kennisgevingen API project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 """

@@ -187,7 +187,7 @@ class TestSubscriptionsView:
         }
 
     @pytest.mark.django_db
-    def test_create_new_subscription(self, api_client):
+    def test_create_new_subscription(self, api_client, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
 
         token = build_jwt_token(
@@ -211,8 +211,17 @@ class TestSubscriptionsView:
             "einddatum": str(today + timedelta(days=30)),
         }
 
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "Access granted for 'new subscription' to 'test@example.com' on '999990019' "
+                "(full request/response in detail)"
+            ),
+        ]:
+            assert log_message in log_messages
+
     @pytest.mark.django_db
-    def test_create_new_subscription_end_date_in_past(self, api_client):
+    def test_create_new_subscription_end_date_in_past(self, api_client, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
 
         token = build_jwt_token(
@@ -246,8 +255,17 @@ class TestSubscriptionsView:
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
 
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "Access denied for 'update subscription' to 'test@example.com' on '999990019' "
+                "(full request/response in detail)"
+            ),
+        ]:
+            assert log_message in log_messages
+
     @pytest.mark.django_db
-    def test_create_new_subscription_end_date_too_far(self, api_client):
+    def test_create_new_subscription_end_date_too_far(self, api_client, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
 
         token = build_jwt_token(
@@ -281,8 +299,17 @@ class TestSubscriptionsView:
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
 
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "Access denied for 'update subscription' to 'test@example.com' on '999990019' "
+                "(full request/response in detail)"
+            ),
+        ]:
+            assert log_message in log_messages
+
     @pytest.mark.django_db
-    def test_change_existing_active_subscription(self, api_client, subscriptions):
+    def test_change_existing_active_subscription(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
 
         token = build_jwt_token(
@@ -300,6 +327,15 @@ class TestSubscriptionsView:
         # End date should be set to the new date
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.data["einddatum"] == str(new_date)
+
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "Access granted for 'update subscription' to 'test@example.com' on '999990019' "
+                "(full request/response in detail)"
+            ),
+        ]:
+            assert log_message in log_messages
 
 
 class TestUpdateViews:

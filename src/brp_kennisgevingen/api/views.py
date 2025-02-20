@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -20,6 +22,8 @@ from .serializers import (
     UpdateSubscriptionSerializer,
 )
 from .utils import is_valid_bsn
+
+audit_log = logging.getLogger("brp_kennisgevingen.audit")
 
 
 class BaseAPIView(APIView):
@@ -98,6 +102,26 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             return UpdateSubscriptionSerializer
         return SubscriptionSerializer
 
+    def log_access(self, request, msg: str, bsn: str):
+        user_scopes = set(request.get_token_scopes)
+        user_id = request.get_token_claims.get("email", request.get_token_subject)
+        extra = {
+            "user": user_id,
+            "granted": sorted(user_scopes),
+            "needed": sorted(self.needed_scopes),
+            "bsn": bsn,
+            "request": request.data,
+        }
+
+        audit_log.info(
+            msg,
+            {
+                "user": user_id,
+                "bsn": bsn,
+            },
+            extra=extra,
+        )
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
@@ -112,16 +136,28 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
+        bsn = self.kwargs["bsn"]
         instance = self.get_object()
 
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            msg = (
+                "Access denied for 'update subscription' to '%(user)s' on '%(bsn)s'"
+                " (full request/response in detail)"
+            )
+            self.log_access(request=request, msg=msg, bsn=bsn)
             raise_serializer_validation_error(serializer)
 
         if not instance:
+            msg = (
+                "Access granted for 'new subscription' to '%(user)s' on '%(bsn)s'"
+                " (full request/response in detail)"
+            )
+            self.log_access(request=request, msg=msg, bsn=bsn)
+
             Subscription.objects.create_with_bsn(
                 application_id=self.application_id,
-                bsn=self.kwargs["bsn"],
+                bsn=bsn,
                 start_date=timezone.now().date(),
                 end_date=serializer.validated_data["einddatum"],
             )
@@ -144,6 +180,12 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
                         }
                     ],
                 ) from err
+
+            msg = (
+                "Access granted for 'update subscription' to '%(user)s' on '%(bsn)s'"
+                " (full request/response in detail)"
+            )
+            self.log_access(request=request, msg=msg, bsn=bsn)
 
             return Response(status=status.HTTP_200_OK)
 
