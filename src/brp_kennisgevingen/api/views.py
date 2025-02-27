@@ -27,7 +27,7 @@ audit_log = logging.getLogger("brp_kennisgevingen.audit")
 
 
 class BaseAPIView(APIView):
-    needed_scopes: set = {"benk-brp-volgindicaties"}
+    needed_scopes: set = {"benk-brp-volgindicaties-api"}
 
     authentication_classes = [authentication.JWTAuthentication]
 
