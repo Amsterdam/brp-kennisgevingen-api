@@ -63,7 +63,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -77,7 +77,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -96,7 +96,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -112,7 +112,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -128,7 +128,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -142,7 +142,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -163,7 +163,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -192,7 +192,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         today = timezone.now().date()
@@ -226,7 +226,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
 
@@ -270,7 +270,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
 
@@ -314,7 +314,7 @@ class TestSubscriptionsView:
 
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
 
@@ -350,7 +350,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -366,7 +366,7 @@ class TestUpdateViews:
         url = reverse("updates-list")
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -396,7 +396,7 @@ class TestUpdateViews:
         query_params = {"vanaf": today}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -422,7 +422,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -446,7 +446,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -473,7 +473,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -500,7 +500,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -527,7 +527,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -542,7 +542,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties",
+                "benk-brp-volgindicaties-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
