@@ -12,9 +12,9 @@ import brp_kennisgevingen.api.urls
 from . import views
 
 urlpatterns = [
-    path("", include(brp_kennisgevingen.api.urls)),
+    path("v1/", include(brp_kennisgevingen.api.urls)),
     path("status", views.RootView.as_view()),
-    path("swagger/", SpectacularSwaggerView.as_view(url_name="schema-json"), name="swagger-ui"),
+    path("schema/", SpectacularSwaggerView.as_view(url_name="schema-json"), name="swagger-ui"),
     path("openapi.json", SpectacularJSONAPIView.as_view(), name="schema-json"),
     path("openapi.yaml", SpectacularYAMLAPIView.as_view(), name="schema-yaml"),
 ]
