@@ -328,9 +328,9 @@ deprecated==1.2.18 \
     # via
     #   opentelemetry-api
     #   opentelemetry-semantic-conventions
-django==5.1.6 \
-    --hash=sha256:1e39eafdd1b185e761d9fab7a9f0b9fa00af1b37b25ad980a8aa0dac13535690 \
-    --hash=sha256:8d203400bc2952fbfb287c2bbda630297d654920c72a73cc82a9ad7926feaad5
+django==5.1.7 \
+    --hash=sha256:1323617cb624add820cb9611cdcc788312d250824f92ca6048fda8625514af2b \
+    --hash=sha256:30de4ee43a98e5d3da36a9002f287ff400b43ca51791920bfb35f6917bfe041c
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
@@ -583,9 +583,9 @@ pyjwt[crypto]==2.10.1 \
     # via
     #   msal
     #   pyjwt
-pytest==8.3.4 \
-    --hash=sha256:50e16d954148559c9a74109af1eaf0c945ba2d8f30f0a3d3335edde19788b6f6 \
-    --hash=sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761
+pytest==8.3.5 \
+    --hash=sha256:c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820 \
+    --hash=sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845
     # via
     #   -r requirements.in
     #   pytest-cov
@@ -598,9 +598,9 @@ pytest-django==4.10.0 \
     --hash=sha256:1091b20ea1491fd04a310fc9aaff4c01b4e8450e3b157687625e16a6b5f3a366 \
     --hash=sha256:57c74ef3aa9d89cae5a5d73fbb69a720a62673ade7ff13b9491872409a3f5918
     # via -r requirements.in
-python-json-logger==3.2.1 \
-    --hash=sha256:8eb0554ea17cb75b05d2848bc14fb02fbdbd9d6972120781b974380bfa162008 \
-    --hash=sha256:cdc17047eb5374bd311e748b42f99d71223f3b0e186f4206cc5d52aefe85b090
+python-json-logger==3.3.0 \
+    --hash=sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84 \
+    --hash=sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7
     # via -r requirements.in
 python-owasp-zap-v2-4==0.1.0 \
     --hash=sha256:2af4252320b3b77a38712081422688e676e038306cf1f2792feed811235afa8b \
