@@ -350,6 +350,7 @@ SPECTACULAR_SETTINGS = {
         "name": "European Union Public License, version 1.2 (EUPL-1.2)",
         "url": "https://eupl.eu/1.2/nl/",
     },
+    "SCHEMA_PATH_PREFIX_PATH": env.str("SCHEMA_PATH_PREFIX_PATH", None),
     "AUTHENTICATION_WHITELIST": None,
     "PREPROCESSING_HOOKS": [
         "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
