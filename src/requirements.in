@@ -13,7 +13,7 @@ whitenoise == 6.9.0
 
 # Monitoring
 azure-monitor-opentelemetry == 1.6.5
-azure-identity == 1.20.0
+azure-identity == 1.21.0
 uwsgitop == 0.12
 uwsgi-readiness-check == 0.2.0
 

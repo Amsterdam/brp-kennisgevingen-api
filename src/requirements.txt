@@ -34,9 +34,9 @@ azure-core-tracing-opentelemetry==1.0.0b11 \
     --hash=sha256:016cefcaff2900fb5cdb7a8a7abd03e9c266622c06e26b3fe6dafa54c4b48bf5 \
     --hash=sha256:a230d1555838b5d07b7594221cd639ea7bc24e29c881e5675e311c6067bad4f5
     # via azure-monitor-opentelemetry
-azure-identity==1.20.0 \
-    --hash=sha256:40597210d56c83e15031b0fe2ea3b26420189e1e7f3e20bdbb292315da1ba014 \
-    --hash=sha256:5f23fc4889a66330e840bd78830287e14f3761820fe3c5f77ac875edcb9ec998
+azure-identity==1.21.0 \
+    --hash=sha256:258ea6325537352440f71b35c3dffe9d240eae4a5126c1b7ce5efd5766bd9fd9 \
+    --hash=sha256:ea22ce6e6b0f429bc1b8d9212d5b9f9877bd4c82f1724bfa910760612c07a9a6
     # via -r requirements.in
 azure-monitor-opentelemetry==1.6.5 \
     --hash=sha256:5a25b0748b0f5785d7ed8141019125574984d78b8ca0ae8fe11849bf514a1331 \
