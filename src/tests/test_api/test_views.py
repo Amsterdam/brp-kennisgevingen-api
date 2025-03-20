@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+from brp_kennisgevingen.models import BSNMutation
 from tests.utils import build_jwt_token
 
 
@@ -414,7 +415,7 @@ class TestUpdateViews:
         }
 
     @pytest.mark.django_db
-    def test_subscriptions_without_mutation_date_returns_empty_array(
+    def test_subscriptions_without_inserted_at_returns_empty_array(
         self, api_client, subscriptions
     ):
         url = reverse("updates-list")
@@ -440,7 +441,7 @@ class TestUpdateViews:
         }
 
     @pytest.mark.django_db
-    def test_mutation_date_within_search_window(self, api_client, subscriptions):
+    def test_inserted_at_within_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
         start_date = timezone.now().date() - timedelta(days=10)
         query_params = {"vanaf": start_date}
@@ -455,11 +456,11 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = subscriptions[0].bsn
+        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )
-        bsn_mutation.mutation_date = timezone_aware_start_date + timedelta(days=3)
+        bsn_mutation.inserted_at = timezone_aware_start_date + timedelta(days=3)
         bsn_mutation.save()
 
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -467,7 +468,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 1
 
     @pytest.mark.django_db
-    def test_mutation_date_outside_search_window(self, api_client, subscriptions):
+    def test_inserted_at_outside_search_window(self, api_client, subscriptions):
         url = reverse("updates-list")
         start_date = timezone.now().date() - timedelta(days=10)
         query_params = {"vanaf": start_date}
@@ -482,11 +483,11 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = subscriptions[0].bsn
+        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )
-        bsn_mutation.mutation_date = timezone_aware_start_date - timedelta(days=3)
+        bsn_mutation.inserted_at = timezone_aware_start_date - timedelta(days=3)
         bsn_mutation.save()
 
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -494,7 +495,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
-    def test_mutation_date_in_future(self, api_client, subscriptions):
+    def test_inserted_at_in_future(self, api_client, subscriptions):
         url = reverse("updates-list")
         start_date = timezone.now().date() - timedelta(days=10)
         query_params = {"vanaf": start_date}
@@ -509,11 +510,11 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = subscriptions[0].bsn
+        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )
-        bsn_mutation.mutation_date = timezone_aware_start_date + timedelta(days=15)
+        bsn_mutation.inserted_at = timezone_aware_start_date + timedelta(days=15)
         bsn_mutation.save()
 
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")

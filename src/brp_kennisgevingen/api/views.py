@@ -9,7 +9,12 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from brp_kennisgevingen.models import NewResident, Subscription, SubscriptionTooLongException
+from brp_kennisgevingen.models import (
+    BSNMutation,
+    NewResident,
+    Subscription,
+    SubscriptionTooLongException,
+)
 from brp_kennisgevingen.openapi import schema
 
 from . import authentication, permissions
@@ -91,7 +96,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
         queryset = self.filter_queryset(self.get_queryset())
 
         try:
-            instance = queryset.get(bsn__bsn=bsn)
+            instance = queryset.get(bsn=bsn)
         except Subscription.DoesNotExist:
             return None
 
@@ -195,7 +200,7 @@ class UpdatesAPIBaseView(BaseAPIView):
     renderer_classes = [HALJSONRenderer]
 
     bsn_field: str = "bsn"
-    mutation_date_field: str = "mutation_date"
+    inserted_at_field: str = "inserted_at"
 
     def get_queryset(self):
         queryset = self.queryset
@@ -214,8 +219,8 @@ class UpdatesAPIBaseView(BaseAPIView):
 
         start_date = query_serializer.validated_data["vanaf"]
         filter_kwargs = {
-            f"{self.mutation_date_field}__gte": start_date,
-            f"{self.mutation_date_field}__lt": timezone.now(),
+            f"{self.inserted_at_field}__gte": start_date,
+            f"{self.inserted_at_field}__lt": timezone.now(),
         }
 
         queryset = queryset.filter(**filter_kwargs)
@@ -242,8 +247,10 @@ class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     """
 
     queryset = Subscription.objects.active()
-    bsn_field: str = "bsn_id"
-    mutation_date_field: str = "bsn__mutation_date"
+
+    def get_queryset(self):
+        subscriptions = super().get_queryset().values_list("bsn", flat=True).distinct()
+        return BSNMutation.objects.filter(bsn__in=subscriptions)
 
 
 @extend_schema_view(get=schema.list_updates_schema)

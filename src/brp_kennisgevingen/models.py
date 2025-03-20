@@ -11,10 +11,10 @@ class BSNMutation(models.Model):
     """
 
     bsn = models.CharField(max_length=9, unique=True, primary_key=True)
-    mutation_date = models.DateTimeField(null=True)
+    inserted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f"{self.pk} ({self.mutation_date})"
+        return f"{self.pk} ({self.inserted_at})"
 
 
 class SubscriptionManager(models.Manager):
@@ -24,10 +24,11 @@ class SubscriptionManager(models.Manager):
         return self.filter(end_date__gt=today)
 
     def create_with_bsn(self, application_id: str, bsn: str, start_date: date, end_date: date):
-        bsn_instance, _ = BSNMutation.objects.get_or_create(bsn=bsn)
+        # Make sure a BSN Mutation records exists
+        _ = BSNMutation.objects.get_or_create(bsn=bsn)
         return self.create(
             application_id=application_id,
-            bsn=bsn_instance,
+            bsn=bsn,
             start_date=start_date,
             end_date=end_date,
         )
@@ -43,7 +44,7 @@ class Subscription(models.Model):
     """
 
     application_id = models.CharField(max_length=255)
-    bsn = models.ForeignKey(BSNMutation, on_delete=models.CASCADE)
+    bsn = models.CharField(max_length=9)
     start_date = models.DateField()
     end_date = models.DateField()
 
@@ -57,7 +58,7 @@ class Subscription(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.application_id} {self.bsn_id} ({self.start_date}-{self.end_date})"
+        return f"{self.pk} {self.application_id} ({self.start_date}-{self.end_date})"
 
     def set_end_date(self, end_date):
         today = timezone.now().date()
@@ -80,7 +81,7 @@ class NewResident(models.Model):
     """
 
     bsn = models.CharField(max_length=9, unique=True, primary_key=True)
-    mutation_date = models.DateTimeField(null=True)
+    inserted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f"{self.pk} ({self.mutation_date})"
+        return f"{self.pk} ({self.inserted_at})"

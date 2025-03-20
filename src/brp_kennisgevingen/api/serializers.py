@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 
 class SubscriptionSerializer(serializers.Serializer):
-    burgerservicenummer = serializers.CharField(source="bsn.bsn")
+    burgerservicenummer = serializers.CharField(source="bsn")
     begindatum = serializers.DateField(source="start_date")
     einddatum = serializers.DateField(source="end_date")
 
