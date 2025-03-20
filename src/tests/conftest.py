@@ -124,28 +124,28 @@ def subscription_past() -> Subscription:
 def new_residents() -> list[NewResident]:
     """
     Creates four new residents:
-    - Two with a mutation_date set
-    - One without a mutation_date set
-    - One with a mutation date in the future
+    - Two with a inserted_at set
+    - One without a inserted_at set
+    - One with a inserted_at in the future
     """
     today = timezone.now()
 
     new_residents = [
         {
             "bsn": "999990019",
-            "mutation_date": today - timedelta(days=30),
+            "inserted_at": today - timedelta(days=30),
         },
         {
             "bsn": "999990093",
-            "mutation_date": today - timedelta(days=10),
+            "inserted_at": today - timedelta(days=10),
         },
         {
             "bsn": "999990147",
-            "mutation_date": None,
+            "inserted_at": None,
         },
         {
             "bsn": "999990214",
-            "mutation_date": today + timedelta(days=10),
+            "inserted_at": today + timedelta(days=10),
         },
     ]
 
