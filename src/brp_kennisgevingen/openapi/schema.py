@@ -1,4 +1,6 @@
+from drf_spectacular.extensions import OpenApiAuthenticationExtension
 from drf_spectacular.openapi import AutoSchema as _AutoSchema
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import exceptions, serializers, status
 
@@ -31,6 +33,17 @@ class AutoSchema(_AutoSchema):
     def get_override_parameters(self):
         params = super().get_override_parameters()
         return params + self.global_params
+
+
+class JWTTokenScheme(OpenApiAuthenticationExtension):
+    target_class = "brp_kennisgevingen.api.authentication.JWTAuthentication"
+    name = "JWTAuthentication"
+
+    def get_security_definition(self, auto_schema):
+        return {
+            "type": "http",
+            "scheme": "bearer",
+        }
 
 
 class InvalidParamsSerializer(serializers.Serializer):
@@ -243,6 +256,16 @@ put_subscription_schema = extend_schema(
 )
 
 list_updates_schema = extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="vanaf",
+            description="Alleen personen waarbij gegevens zijn gewijzigd op of na "
+            "deze datum worden geleverd.",
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+            required=True,
+        ),
+    ],
     responses={
         200: OpenApiResponse(
             response=UpdatesSerializer,
@@ -275,6 +298,23 @@ list_updates_schema = extend_schema(
 )
 
 list_new_residents_schema = extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="vanaf",
+            description="Alleen personen waarbij gegevens zijn gewijzigd op of na "
+            "deze datum worden geleverd.",
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+            required=True,
+        ),
+        OpenApiParameter(
+            name="maxLeeftijd",
+            description="Alleen personen waarbij de leeftijd op de 'vanaf' datum kleiner is dan"
+            "de maximale leeftijd worden geleverd.",
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+        ),
+    ],
     responses={
         200: UpdatesSerializer,
         **default_error_responses_with_bad_request_start_date,

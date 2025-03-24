@@ -355,11 +355,6 @@ SPECTACULAR_SETTINGS = {
     "PREPROCESSING_HOOKS": [
         "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
     ],
-    "APPEND_COMPONENTS": {
-        "securitySchemes": {
-            "JWTAuthentication": {"type": "apiKey", "in": "header", "name": "Authorization"}
-        }
-    },
     "TAGS": [
         {"name": "Manage subscriptions"},
         {"name": "List updates"},

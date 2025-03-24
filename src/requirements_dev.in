@@ -5,9 +5,9 @@ pur == 7.3.3
 pip-tools==7.4.1
 
 # Linting
-pre-commit==4.1.0
+pre-commit==4.2.0
 black==25.1.0
-ruff==0.9.10
+ruff==0.11.0
 
 # Testing
 pytest-sugar==1.0.0

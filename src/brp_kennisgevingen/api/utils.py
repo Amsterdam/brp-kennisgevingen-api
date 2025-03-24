@@ -1,3 +1,8 @@
+import re
+
+SNAKE_REGEX = re.compile("(?<=[a-z])([A-Z])")
+
+
 def is_valid_bsn(value: str) -> bool:
     if not isinstance(value, str):
         return False
@@ -15,3 +20,20 @@ def is_valid_bsn(value: str) -> bool:
 
     # Validate if the remainder of the total divided by 11 is equal to the last number in the BSN
     return total % 11 == last_number
+
+
+def to_snake_case_data(data):
+    if isinstance(data, dict):
+        return {to_snake_case(k): to_snake_case_data(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [to_snake_case_data(datum) for datum in data]
+    else:
+        return data
+
+
+def match_snake(match):
+    return f"_{match.group(1).lower()}"
+
+
+def to_snake_case(text):
+    return SNAKE_REGEX.sub(match_snake, text)
