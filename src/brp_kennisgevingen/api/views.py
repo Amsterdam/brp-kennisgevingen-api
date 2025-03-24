@@ -1,5 +1,6 @@
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -21,8 +22,9 @@ from . import authentication, permissions
 from .exceptions import ProblemJsonException, raise_serializer_validation_error
 from .renderers import HALJSONRenderer
 from .serializers import (
-    DateInputSerializer,
+    NewResidentsInputSerializer,
     SubscriptionSerializer,
+    UpdatesInputSerializer,
     UpdatesSerializer,
     UpdateSubscriptionSerializer,
 )
@@ -198,9 +200,23 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
 class UpdatesAPIBaseView(BaseAPIView):
     queryset = None
     renderer_classes = [HALJSONRenderer]
+    input_serializer = None
 
     bsn_field: str = "bsn"
     inserted_at_field: str = "inserted_at"
+
+    def filter_queryset(self, queryset):
+        # Validate URL query parameters
+        query_serializer = self._validate_input_serializer(self.request.query_params)
+
+        start_date = query_serializer.validated_data["vanaf"]
+
+        filter_kwargs = {
+            f"{self.inserted_at_field}__gte": start_date,
+            f"{self.inserted_at_field}__lt": timezone.now(),
+        }
+
+        return queryset.filter(**filter_kwargs)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -211,19 +227,11 @@ class UpdatesAPIBaseView(BaseAPIView):
 
     def get(self, request, *args, **kwargs):
         # Validate URL query parameters
-        query_serializer = DateInputSerializer(data=self.request.query_params)
+        query_serializer = UpdatesInputSerializer(data=self.request.query_params)
         if not query_serializer.is_valid():
             raise_serializer_validation_error(query_serializer)
 
-        queryset = self.get_queryset()
-
-        start_date = query_serializer.validated_data["vanaf"]
-        filter_kwargs = {
-            f"{self.inserted_at_field}__gte": start_date,
-            f"{self.inserted_at_field}__lt": timezone.now(),
-        }
-
-        queryset = queryset.filter(**filter_kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
 
         serializer = UpdatesSerializer(
             {
@@ -239,6 +247,13 @@ class UpdatesAPIBaseView(BaseAPIView):
         )
         return Response(serializer.data)
 
+    def _validate_input_serializer(self, query_params):
+        # Validate URL query parameters
+        query_serializer = self.input_serializer(data=query_params)
+        if not query_serializer.is_valid():
+            raise_serializer_validation_error(query_serializer)
+        return query_serializer
+
 
 @extend_schema_view(get=schema.list_updates_schema)
 class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
@@ -247,16 +262,33 @@ class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     """
 
     queryset = Subscription.objects.active()
+    input_serializer = UpdatesInputSerializer
 
     def get_queryset(self):
         subscriptions = super().get_queryset().values_list("bsn", flat=True).distinct()
         return BSNMutation.objects.filter(bsn__in=subscriptions)
 
 
-@extend_schema_view(get=schema.list_updates_schema)
+@extend_schema_view(get=schema.list_new_residents_schema)
 class NewResidentsListAPIView(UpdatesAPIBaseView):
     """
     Request a list of `burgerservicenummers` of new residents.
     """
 
     queryset = NewResident.objects.all()
+    input_serializer = NewResidentsInputSerializer
+
+    def filter_queryset(self, queryset):
+        query_serializer = self._validate_input_serializer(self.request.query_params)
+        queryset = super().filter_queryset(queryset)
+
+        if max_age := query_serializer.validated_data.get("max_leeftijd"):
+
+            start_date = query_serializer.validated_data["vanaf"]
+            filter_kwargs = {}
+
+            min_birthdate = start_date - relativedelta(years=max_age)
+            filter_kwargs["birthdate__gte"] = min_birthdate
+
+            return queryset.filter(**filter_kwargs)
+        return queryset

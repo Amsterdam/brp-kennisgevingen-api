@@ -4,6 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.handlers.wsgi import WSGIRequest
 from django.utils import timezone
 from rest_framework.request import Request
@@ -124,27 +125,31 @@ def subscription_past() -> Subscription:
 def new_residents() -> list[NewResident]:
     """
     Creates four new residents:
-    - Two with a inserted_at set
-    - One without a inserted_at set
-    - One with a inserted_at in the future
+    - Two with an inserted_at set, one of them has a birthdate set
+    - One without an inserted_at set
+    - One with an inserted_at in the future
     """
     today = timezone.now()
 
     new_residents = [
         {
             "bsn": "999990019",
+            "birthdate": None,
             "inserted_at": today - timedelta(days=30),
         },
         {
             "bsn": "999990093",
+            "birthdate": today - relativedelta(years=10),
             "inserted_at": today - timedelta(days=10),
         },
         {
             "bsn": "999990147",
+            "birthdate": None,
             "inserted_at": None,
         },
         {
             "bsn": "999990214",
+            "birthdate": None,
             "inserted_at": today + timedelta(days=10),
         },
     ]

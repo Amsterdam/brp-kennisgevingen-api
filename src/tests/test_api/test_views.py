@@ -550,3 +550,31 @@ class TestUpdateViews:
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
+
+    @pytest.mark.django_db
+    def test_new_resident_with_max_age(self, api_client, new_residents):
+        """
+        One new resident within the search window has an age of 10. We should
+        be able to filter this record bases on the maxLeeftijd parameter
+        """
+        url = reverse("new-residents-list")
+        start_date = timezone.now().date() - timedelta(days=15)
+        query_params = {
+            "vanaf": start_date,
+            "maxLeeftijd": 15,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data["burgerservicenummers"]) == 1
+
+        query_params["maxLeeftijd"] = 9
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data["burgerservicenummers"]) == 0
