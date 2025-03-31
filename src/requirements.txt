@@ -354,9 +354,9 @@ django-healthchecks==1.5.0 \
     --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
     --hash=sha256:25eb021a4a94240b28d996e82775ad6c3b392a2b262360b965a24b88fcfad78d
     # via -r requirements.in
-djangorestframework==3.15.2 \
-    --hash=sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20 \
-    --hash=sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad
+djangorestframework==3.16.0 \
+    --hash=sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361 \
+    --hash=sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9
     # via
     #   -r requirements.in
     #   drf-spectacular
