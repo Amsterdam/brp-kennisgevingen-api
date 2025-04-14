@@ -37,11 +37,11 @@ azure-core-tracing-opentelemetry==1.0.0b11 \
 azure-identity==1.21.0 \
     --hash=sha256:258ea6325537352440f71b35c3dffe9d240eae4a5126c1b7ce5efd5766bd9fd9 \
     --hash=sha256:ea22ce6e6b0f429bc1b8d9212d5b9f9877bd4c82f1724bfa910760612c07a9a6
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 azure-monitor-opentelemetry==1.6.5 \
     --hash=sha256:5a25b0748b0f5785d7ed8141019125574984d78b8ca0ae8fe11849bf514a1331 \
     --hash=sha256:9e04fe20db099765ad17a4542ee89dccc59ef152b9c279d45c4e2148d020bb44
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 azure-monitor-opentelemetry-exporter==1.0.0b35 \
     --hash=sha256:5ecc1c502485ede7a11ccc9ef9370abf6ec4b0431ebec77dab25d568d018f04f \
     --hash=sha256:93c8824f6c2589905159b4c27640f4be65ce96e1b51959b6b32ea63f518c3944
@@ -361,10 +361,10 @@ cryptography==44.0.2 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==1.4.0 \
-    --hash=sha256:275038acca712139d68041cfd987c9e6d2aa1bcfb7e73d37d27abed64b8f2386 \
-    --hash=sha256:dd51ccdaf6a7b330cca7826d9570c11f97af3853e8ff184bb9c8345d52f847df
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+datapunt-authorization-django==1.5.0 \
+    --hash=sha256:24f7af06d1001a717ed8d60e3e83f42576b9022ee11edec436988bf126e8e164 \
+    --hash=sha256:3d64d6809ce457461301a5f94a8037f2703fdc61dc45e2f5caccefbf6b2ea2ec
+    # via -r ./requirements.in
 deprecated==1.2.18 \
     --hash=sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d \
     --hash=sha256:bd5011788200372a32418f888e326a09ff80d0214bd961147cfed01b5c018eec
@@ -375,11 +375,11 @@ distlib==0.3.9 \
     --hash=sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87 \
     --hash=sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403
     # via virtualenv
-django==5.1.7 \
-    --hash=sha256:1323617cb624add820cb9611cdcc788312d250824f92ca6048fda8625514af2b \
-    --hash=sha256:30de4ee43a98e5d3da36a9002f287ff400b43ca51791920bfb35f6917bfe041c
+django==5.1.8 \
+    --hash=sha256:11b28fa4b00e59d0def004e9ee012fefbb1065a5beb39ee838983fd24493ad4f \
+    --hash=sha256:42e92a1dd2810072bcc40a39a212b693f94406d0ba0749e68eb642f31dc770b4
     # via
-    #   -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    #   -r ./requirements.in
     #   datapunt-authorization-django
     #   django-cors-headers
     #   django-debug-toolbar
@@ -390,15 +390,15 @@ django==5.1.7 \
 django-cors-headers==4.7.0 \
     --hash=sha256:6fdf31bf9c6d6448ba09ef57157db2268d515d94fc5c89a0a1028e1fc03ee52b \
     --hash=sha256:f1c125dcd58479fe7a67fe2499c16ee38b81b397463cf025f0e2c42937421070
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
-django-debug-toolbar==5.0.1 \
-    --hash=sha256:296f6f18a80710e84fbb8361538ae5ec522a75ebe9ab67db34bcf1026cbeb420 \
-    --hash=sha256:7456cc2e951db37dab335686db7803c4a0ecb6736d120705f6668db9548bf49f
+    # via -r ./requirements.in
+django-debug-toolbar==5.1.0 \
+    --hash=sha256:8a3b9da4aeab8d384a366e20304bd939a451f0242523c5b7b402248ad474eed2 \
+    --hash=sha256:c0591e338ee9603bdfce5aebf8d18ca7341fdbb69595e2b0b34869be5857180e
     # via -r requirements_dev.in
 django-environ==0.12.0 \
     --hash=sha256:227dc891453dd5bde769c3449cf4a74b6f2ee8f7ab2361c93a07068f4179041a \
     --hash=sha256:92fb346a158abda07ffe6eb23135ce92843af06ecf8753f43adf9d2366dcc0ca
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 django-extensions==3.2.3 \
     --hash=sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a \
     --hash=sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401
@@ -406,17 +406,17 @@ django-extensions==3.2.3 \
 django-healthchecks==1.5.0 \
     --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
     --hash=sha256:25eb021a4a94240b28d996e82775ad6c3b392a2b262360b965a24b88fcfad78d
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
-djangorestframework==3.15.2 \
-    --hash=sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20 \
-    --hash=sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad
+    # via -r ./requirements.in
+djangorestframework==3.16.0 \
+    --hash=sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361 \
+    --hash=sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9
     # via
-    #   -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    #   -r ./requirements.in
     #   drf-spectacular
 drf-spectacular==0.28.0 \
     --hash=sha256:2c778a47a40ab2f5078a7c42e82baba07397bb35b074ae4680721b2805943061 \
     --hash=sha256:856e7edf1056e49a4245e87a61e8da4baff46c83dbc25be1da2df77f354c7cb4
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 filelock==3.18.0 \
     --hash=sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2 \
     --hash=sha256:c401f4f8377c4464e6db25fff06205fd89bdd83b65eb0488ed1b160f780e21de
@@ -663,7 +663,7 @@ psycopg2==2.9.10 \
     --hash=sha256:91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2 \
     --hash=sha256:9d5b3b94b79a844a986d029eee38998232451119ad653aea42bb9220a8c5066b \
     --hash=sha256:c6f7b8561225f9e711a9c47087388a97fdc948211c10a4bccbf0ba68ab7b3b5a
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 pur==7.3.3 \
     --hash=sha256:83acc7fc4d07dbd6b026e2bcb33611f61f7c51a30b9f5ef6f4f9e2846a23f19d
     # via -r requirements_dev.in
@@ -687,18 +687,18 @@ pytest==8.3.5 \
     --hash=sha256:c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820 \
     --hash=sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845
     # via
-    #   -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    #   -r ./requirements.in
     #   pytest-cov
     #   pytest-django
     #   pytest-sugar
-pytest-cov==6.0.0 \
-    --hash=sha256:eee6f1b9e61008bd34975a4d5bab25801eb31898b032dd55addc93e96fcaaa35 \
-    --hash=sha256:fde0b595ca248bb8e2d76f020b465f3b107c9632e6a1d1705f17834c89dcadc0
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
-pytest-django==4.10.0 \
-    --hash=sha256:1091b20ea1491fd04a310fc9aaff4c01b4e8450e3b157687625e16a6b5f3a366 \
-    --hash=sha256:57c74ef3aa9d89cae5a5d73fbb69a720a62673ade7ff13b9491872409a3f5918
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+pytest-cov==6.1.1 \
+    --hash=sha256:46935f7aaefba760e716c2ebfbe1c216240b9592966e7da99ea8292d4d3e2a0a \
+    --hash=sha256:bddf29ed2d0ab6f4df17b4c55b0a657287db8684af9c42ea546b21b1041b3dde
+    # via -r ./requirements.in
+pytest-django==4.11.1 \
+    --hash=sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10 \
+    --hash=sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991
+    # via -r ./requirements.in
 pytest-sugar==1.0.0 \
     --hash=sha256:6422e83258f5b0c04ce7c632176c7732cab5fdb909cb39cca5c9139f81276c0a \
     --hash=sha256:70ebcd8fc5795dc457ff8b69d266a4e2e8a74ae0c3edc749381c64b5246c8dfd
@@ -706,15 +706,15 @@ pytest-sugar==1.0.0 \
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 python-json-logger==3.3.0 \
     --hash=sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84 \
     --hash=sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 python-owasp-zap-v2-4==0.1.0 \
     --hash=sha256:2af4252320b3b77a38712081422688e676e038306cf1f2792feed811235afa8b \
     --hash=sha256:d4dc00387b0089d81683be01b8272577ad39fb47674377f65c7da0fd30b8abe9
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 pyyaml==6.0.2 \
     --hash=sha256:01179a4a8559ab5de078078f37e5c1a30d76bb88519906844fd7bdea1b7729ff \
     --hash=sha256:0833f8694549e586547b576dcfaba4a6b55b9e96098b36cdc7ebefe667dfed48 \
@@ -782,7 +782,7 @@ requests==2.32.3 \
     --hash=sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760 \
     --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
     # via
-    #   -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    #   -r ./requirements.in
     #   azure-core
     #   datapunt-authorization-django
     #   django-healthchecks
@@ -795,7 +795,7 @@ requests==2.32.3 \
 requests-mock==1.12.1 \
     --hash=sha256:b1e37054004cdd5e56c84454cc7df12b25f90f382159087f4b6915aaeef39563 \
     --hash=sha256:e9e12e333b525156e82a3c852f22016b9158220d2f47454de9cae8a77d371401
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 requests-oauthlib==2.0.0 \
     --hash=sha256:7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 \
     --hash=sha256:b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9
@@ -907,25 +907,25 @@ rpds-py==0.23.1 \
     # via
     #   jsonschema
     #   referencing
-ruff==0.11.0 \
-    --hash=sha256:049a191969a10897fe052ef9cc7491b3ef6de79acd7790af7d7897b7a9bfbcb6 \
-    --hash=sha256:1bc09a7419e09662983b1312f6fa5dab829d6ab5d11f18c3760be7ca521c9329 \
-    --hash=sha256:3191e9116b6b5bbe187447656f0c8526f0d36b6fd89ad78ccaad6bdc2fad7df2 \
-    --hash=sha256:38c23fd9bdec4eb437b4c1e3595905a0a8edfccd63a790f818b28c78fe345639 \
-    --hash=sha256:3c3156d3f4b42e57247275a0a7e15a851c165a4fc89c5e8fa30ea6da4f7407b8 \
-    --hash=sha256:490b1e147c1260545f6d041c4092483e3f6d8eba81dc2875eaebcf9140b53905 \
-    --hash=sha256:6fbb2aed66fe742a6a3a0075ed467a459b7cedc5ae01008340075909d819df1e \
-    --hash=sha256:7c8661b0be91a38bd56db593e9331beaf9064a79028adee2d5f392674bbc5e88 \
-    --hash=sha256:868364fc23f5aa122b00c6f794211e85f7e78f5dffdf7c590ab90b8c4e69b657 \
-    --hash=sha256:92c0c1ff014351c0b0cdfdb1e35fa83b780f1e065667167bb9502d47ca41e6db \
-    --hash=sha256:96bc89a5c5fd21a04939773f9e0e276308be0935de06845110f43fd5c2e4ead7 \
-    --hash=sha256:a9352b9d767889ec5df1483f94870564e8102d4d7e99da52ebf564b882cdc2c7 \
-    --hash=sha256:b6c0e8d3d2db7e9f6efd884f44b8dc542d5b6b590fc4bb334fdbc624d93a29a2 \
-    --hash=sha256:bcfa478daf61ac8002214eb2ca5f3e9365048506a9d52b11bea3ecea822bb844 \
-    --hash=sha256:c58bfa00e740ca0a6c43d41fb004cd22d165302f360aaa56f7126d544db31a21 \
-    --hash=sha256:dc67e32bc3b29557513eb7eeabb23efdb25753684b913bebb8a0c62495095acb \
-    --hash=sha256:e4fd5ff5de5f83e0458a138e8a869c7c5e907541aec32b707f57cf9a5e124445 \
-    --hash=sha256:e55c620690a4a7ee6f1cccb256ec2157dc597d109400ae75bbf944fc9d6462e2
+ruff==0.11.5 \
+    --hash=sha256:0947c0a1afa75dcb5db4b34b070ec2bccee869d40e6cc8ab25aca11a7d527794 \
+    --hash=sha256:2561294e108eb648e50f210671cc56aee590fb6167b594144401532138c66c7b \
+    --hash=sha256:3068befab73620b8a0cc2431bd46b3cd619bc17d6f7695a3e1bb166b652c382a \
+    --hash=sha256:4bfd80a6ec559a5eeb96c33f832418bf0fb96752de0539905cf7b0cc1d31d779 \
+    --hash=sha256:56145ee1478582f61c08f21076dc59153310d606ad663acc00ea3ab5b2125f82 \
+    --hash=sha256:67e241b4314f4eacf14a601d586026a962f4002a475aa702c69980a38087aa4e \
+    --hash=sha256:6c6dc38af3cfe2863213ea25b6dc616d679205732dc0fb673356c2d69608f800 \
+    --hash=sha256:80b4df4d335a80315ab9afc81ed1cff62be112bd165e162b5eed8ac55bfc8470 \
+    --hash=sha256:81be52e7519f3d1a0beadcf8e974715b2dfc808ae8ec729ecfc79bddf8dbb783 \
+    --hash=sha256:ac12884b9e005c12d0bd121f56ccf8033e1614f736f766c118ad60780882a077 \
+    --hash=sha256:ad871ff74b5ec9caa66cb725b85d4ef89b53f8170f47c3406e32ef040400b038 \
+    --hash=sha256:b2a7cedf47244f431fd11aa5a7e2806dda2e0c365873bda7834e8f7d785ae159 \
+    --hash=sha256:cae2e2439cb88853e421901ec040a758960b576126dab520fa08e9de431d1bef \
+    --hash=sha256:e268da7b40f56e3eca571508a7e567e794f9bfcc0f412c4b607931d3af9c4afe \
+    --hash=sha256:e5f66f8f1e8c9fc594cbd66fbc5f246a8d91f916cb9667e80208663ec3728304 \
+    --hash=sha256:e6cf918390cfe46d240732d4d72fa6e18e528ca1f60e318a10835cf2fa3dc19f \
+    --hash=sha256:ef39f19cb8ec98cbc762344921e216f3857a06c47412030374fffd413fb8fd3a \
+    --hash=sha256:f5da2e710a9641828e09aa98b92c9ebbc60518fdf3921241326ca3e8f8e55b8b
     # via -r requirements_dev.in
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
@@ -965,10 +965,10 @@ urllib3==2.3.0 \
 uwsgi-readiness-check==0.2.0 \
     --hash=sha256:b8c4bfba260ec6f1937ca8d8968f2415aba82428637da17653fc04a3378d752e \
     --hash=sha256:e7a2b5a94407193bc876efd28157a45833cb69c372f7684004fa729eca2f1ab0
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 uwsgitop==0.12 \
     --hash=sha256:4f9330951f0fb9633226de36cf0c28c04dcf323efab608834aa81f638b6019b2
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 virtualenv==20.29.3 \
     --hash=sha256:3e3d00f5807e83b234dfb6122bf37cfadf4be216c53a49ac059d02414f819170 \
     --hash=sha256:95e39403fcf3940ac45bc717597dba16110b74506131845d9b687d5e73d947ac
@@ -980,7 +980,7 @@ wheel==0.45.1 \
 whitenoise==6.9.0 \
     --hash=sha256:8c4a7c9d384694990c26f3047e118c691557481d624f069b7f7752a2f735d609 \
     --hash=sha256:c8a489049b7ee9889617bb4c274a153f3d979e8f51d2efd0f5b403caf41c57df
-    # via -r /home/jasper/code/brp-kennisgevingen-api/src/requirements.in
+    # via -r ./requirements.in
 wrapt==1.17.2 \
     --hash=sha256:08e7ce672e35efa54c5024936e559469436f8b8096253404faeb54d2a878416f \
     --hash=sha256:0a6e821770cf99cc586d33833b2ff32faebdbe886bd6322395606cf55153246c \
