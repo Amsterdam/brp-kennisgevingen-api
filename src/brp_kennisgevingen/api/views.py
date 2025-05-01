@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ImproperlyConfigured
@@ -155,6 +156,11 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             self.log_access(request=request, msg=msg, bsn=bsn)
             raise_serializer_validation_error(serializer)
 
+        # Get the subscription end date or set it to the max allowed if no end_date is supplied
+        end_date = serializer.validated_data.get(
+            "einddatum", timezone.now().date() + timedelta(days=182)
+        )
+
         if not instance:
             msg = (
                 "Access granted for 'new subscription' to '%(user)s' on '%(bsn)s'"
@@ -162,17 +168,17 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             )
             self.log_access(request=request, msg=msg, bsn=bsn)
 
-            Subscription.objects.create_with_bsn(
+            instance = Subscription.objects.create_with_bsn(
                 application_id=self.application_id,
                 bsn=bsn,
                 start_date=timezone.now().date(),
-                end_date=serializer.validated_data["einddatum"],
+                end_date=end_date,
             )
-            return Response(status=status.HTTP_201_CREATED)
+            serializer = SubscriptionSerializer(instance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            # Set the new subscription date
             try:
-                instance.set_end_date(serializer.validated_data["einddatum"])
+                instance.set_end_date(end_date)
             except SubscriptionTooLongException as err:
                 raise ProblemJsonException(
                     title="Geen correcte waarde opgegeven.",
@@ -193,8 +199,8 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
                 " (full request/response in detail)"
             )
             self.log_access(request=request, msg=msg, bsn=bsn)
-
-            return Response(status=status.HTTP_200_OK)
+            serializer = SubscriptionSerializer(instance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UpdatesAPIBaseView(BaseAPIView):

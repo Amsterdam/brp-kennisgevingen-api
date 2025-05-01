@@ -202,6 +202,11 @@ class TestSubscriptionsView:
 
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 201
+        assert response.data == {
+            "begindatum": str(today),
+            "burgerservicenummer": "999990019",
+            "einddatum": str(today + timedelta(days=30)),
+        }
 
         # Expect subscription to exist
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -308,6 +313,30 @@ class TestSubscriptionsView:
             ),
         ]:
             assert log_message in log_messages
+
+    @pytest.mark.django_db
+    def test_create_new_subscription_empty_end_date(self, api_client, caplog):
+        url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+
+        data = {}
+
+        today = timezone.now().date()
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 201
+
+        # When no end_date is supplied, the end_date should be 182 days in the future
+        assert response.data == {
+            "begindatum": str(today),
+            "burgerservicenummer": "999990019",
+            "einddatum": str(today + timedelta(days=182)),
+        }
 
     @pytest.mark.django_db
     def test_change_existing_active_subscription(self, api_client, subscriptions, caplog):
