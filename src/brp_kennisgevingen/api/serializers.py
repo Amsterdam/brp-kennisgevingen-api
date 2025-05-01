@@ -13,7 +13,7 @@ class SubscriptionSerializer(serializers.Serializer):
 
 
 class UpdateSubscriptionSerializer(serializers.Serializer):
-    einddatum = serializers.DateField()
+    einddatum = serializers.DateField(required=False)
 
     def validate_einddatum(self, value):
         today = timezone.now().date()
