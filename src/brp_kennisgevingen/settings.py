@@ -367,6 +367,7 @@ DATAPUNT_AUTHZ = {
     # To verify JWT tokens, either the PUB_JWKS or a OAUTH_JWKS_URL needs to be set.
     "JWKS": env.str("PUB_JWKS", None),
     "JWKS_URL": env.str("OAUTH_JWKS_URL", None),
+    "CHECK_CLAIMS": env.dict("OAUTH_CHECK_CLAIMS", default={}),
     # "ALWAYS_OK": True if DEBUG else False,
     "ALWAYS_OK": False,
     "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes
