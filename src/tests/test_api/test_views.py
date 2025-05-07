@@ -16,9 +16,9 @@ class TestBaseView:
     @pytest.mark.parametrize(
         "url",
         [
-            "/v1/volgindicaties",
-            "/v1/volgindicaties/999990019",
-            "/v1/wijzigingen",
+            "/kennisgevingen/v1/volgindicaties",
+            "/kennisgevingen/v1/volgindicaties/999990019",
+            "/kennisgevingen/v1/wijzigingen",
         ],
     )
     def test_no_login(self, api_client, url):
@@ -52,7 +52,7 @@ class TestBaseView:
             "status": 403,
             "detail": "",
             "code": "permissionDenied",
-            "instance": "/v1/volgindicaties",
+            "instance": "/kennisgevingen/v1/volgindicaties",
         }
 
 
@@ -155,7 +155,7 @@ class TestSubscriptionsView:
             "title": "Opgevraagde resource bestaat niet.",
             "status": 404,
             "code": "notFound",
-            "instance": "/v1/volgindicaties/999990147",
+            "instance": "/kennisgevingen/v1/volgindicaties/999990147",
         }
 
     @pytest.mark.django_db
@@ -177,7 +177,7 @@ class TestSubscriptionsView:
             "title": "Waarde is geen geldig BSN.",
             "status": 400,
             "code": "parseError",
-            "instance": "/v1/volgindicaties/invalid",
+            "instance": "/kennisgevingen/v1/volgindicaties/invalid",
             "invalidParams": [
                 {
                     "code": "bsn",
@@ -247,7 +247,7 @@ class TestSubscriptionsView:
             "title": "Geen correcte waarde opgegeven.",
             "status": 400,
             "code": "parseError",
-            "instance": "/v1/volgindicaties/999990019",
+            "instance": "/kennisgevingen/v1/volgindicaties/999990019",
             "invalidParams": [
                 {
                     "name": "einddatum",
@@ -291,7 +291,7 @@ class TestSubscriptionsView:
             "title": "Geen correcte waarde opgegeven.",
             "status": 400,
             "code": "parseError",
-            "instance": "/v1/volgindicaties/999990019",
+            "instance": "/kennisgevingen/v1/volgindicaties/999990019",
             "invalidParams": [
                 {
                     "code": "date",
@@ -372,7 +372,7 @@ class TestUpdateViews:
 
     @pytest.mark.parametrize(
         "url",
-        ["/v1/wijzigingen", "/v1/nieuwe-ingezetenen"],
+        ["/kennisgevingen/v1/wijzigingen", "/kennisgevingen/v1/nieuwe-ingezetenen"],
     )
     @pytest.mark.django_db
     def test_hal_json_response(self, api_client, url, subscriptions, new_residents):
@@ -409,7 +409,7 @@ class TestUpdateViews:
             "status": 400,
             "title": "Geen correcte waarde opgegeven.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
-            "instance": "/v1/wijzigingen",
+            "instance": "/kennisgevingen/v1/wijzigingen",
             "invalidParams": [
                 {
                     "code": "date",
@@ -435,11 +435,8 @@ class TestUpdateViews:
         assert response.data == {
             "burgerservicenummers": [],
             "_links": {
-                "self": {"href": f"/v1/wijzigingen?vanaf={today}"},
-                "ingeschrevenPersoon": {
-                    "href": "/ingeschrevenpersonen/{burgerservicenummer}",
-                    "templated": True,
-                },
+                "self": {"href": f"/kennisgevingen/v1/wijzigingen?vanaf={today}"},
+                "ingeschrevenPersoon": {"href": "/bevragingen/v1/personen"},
             },
         }
 
@@ -461,11 +458,8 @@ class TestUpdateViews:
         assert response.data == {
             "burgerservicenummers": [],
             "_links": {
-                "self": {"href": f"/v1/wijzigingen?vanaf={start_date}"},
-                "ingeschrevenPersoon": {
-                    "href": "/ingeschrevenpersonen/{burgerservicenummer}",
-                    "templated": True,
-                },
+                "self": {"href": f"/kennisgevingen/v1/wijzigingen?vanaf={start_date}"},
+                "ingeschrevenPersoon": {"href": "/bevragingen/v1/personen"},
             },
         }
 

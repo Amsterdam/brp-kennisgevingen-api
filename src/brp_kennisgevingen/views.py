@@ -1,10 +1,8 @@
-from django.http import JsonResponse
-from django.views import View
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.views import exception_handler as drf_exception_handler
 
-from brp_kennisgevingen.api.exceptions import ProblemJsonException
+from brp_kennisgevingen.kennisgevingen.exceptions import ProblemJsonException
 
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
@@ -18,13 +16,6 @@ STATUS_TO_URI = {
     status.HTTP_503_SERVICE_UNAVAILABLE: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.4",
     status.HTTP_504_GATEWAY_TIMEOUT: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.5",
 }
-
-
-class RootView(View):
-    """Status page of the server."""
-
-    def get(self, request, *args, **kwargs):
-        return JsonResponse({"status": "online"})
 
 
 def _get_unique_trace_id(request):

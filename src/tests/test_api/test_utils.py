@@ -1,6 +1,6 @@
 import pytest
 
-from brp_kennisgevingen.api.utils import is_valid_bsn
+from brp_kennisgevingen.kennisgevingen.utils import is_valid_bsn
 
 
 class TestIsValidBSN:

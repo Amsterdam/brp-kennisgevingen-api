@@ -1,9 +1,11 @@
 import logging
 from datetime import timedelta
+from fnmatch import fnmatch
 
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
+from django.urls import get_resolver
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema_view
 from rest_framework import status
@@ -32,6 +34,33 @@ from .serializers import (
 from .utils import is_valid_bsn
 
 audit_log = logging.getLogger("brp_kennisgevingen.audit")
+
+
+class IndexView(APIView):
+    """Having some response on the /kennisgevingen/v1/ path fixes the healthcheck."""
+
+    def get(self, request):
+        return Response(
+            {
+                "status": "online",
+                "paths": self._list_urls(),
+            }
+        )
+
+    def _list_urls(self):
+        patterns = get_resolver().url_patterns
+        return _extract_patterns(patterns, prefix="/", match="/kennisgevingen/v1/?*")
+
+
+def _extract_patterns(patterns, prefix, match):
+    urls = []
+    for pattern in patterns:
+        url = f"{prefix}{pattern.pattern}"
+        if hasattr(pattern, "url_patterns") and match.startswith(url):
+            urls.extend(_extract_patterns(pattern.url_patterns, url, match))
+        elif fnmatch(url, match):
+            urls.append(url)
+    return urls
 
 
 class BaseAPIView(APIView):
