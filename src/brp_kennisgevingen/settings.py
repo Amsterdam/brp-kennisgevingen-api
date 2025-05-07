@@ -47,7 +47,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "brp_kennisgevingen.api.middleware.APIVersionMiddleware",
+    "brp_kennisgevingen.kennisgevingen.middleware.APIVersionMiddleware",
     "authorization_django.authorization_middleware",
 ]
 
@@ -341,23 +341,37 @@ REST_FRAMEWORK = dict(
     DEFAULT_AUTHENTICATION_CLASSES=[],
 )
 
+SPECTACULAR_DESCRIPTION = """Met deze API kun je opvragen welke door jou gevolgde personen zijn
+gewijzigd in de BRP. Je kunt je abonneren op een persoon die je wilt volgen, en je kunt opvragen
+welke personen door jou worden gevolgd. Je kunt deze API gebruiken in combinatie met de BRP
+Bevragen API, bijvoorbeeld om lokale kopiegegevens actueel te houden.
+
+Om lokale kopiegegevens actueel te houden kun je de volgende procedure volgen:
+1. Zet de volgindicatie.
+2. Vraag de persoonsgegevens op met de BRP Bevragen API.
+3. Vraag periodiek (bijvoorbeeld dagelijks) de wijzigingen op met GET
+/kennisgevingen/v1/wijzigingen. Gebruik parameter "vanaf" met de datum dat de laatste/vorige
+keer wijzigingen waren gevraagd. Voor elk burgerservicenummer in de response
+"burgerservicenummers" vraag je de persoonsgegevens op met de BRP Bevragen API."""
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "BRP Kennisgevingen API",
-    "DESCRIPTION": "BRP Kennisgevingen API",
+    "DESCRIPTION": SPECTACULAR_DESCRIPTION,
     "CONTACT": {"email": "datapunt@amsterdam.nl"},
     "VERSION": "1.0.0",
     "LICENSE": {
         "name": "European Union Public License, version 1.2 (EUPL-1.2)",
         "url": "https://eupl.eu/1.2/nl/",
     },
-    "SCHEMA_PATH_PREFIX_INSERT": env.str("SCHEMA_PATH_PREFIX_INSERT", None),
+    "SCHEMA_PATH_PREFIX": "/kennisgevingen/v1",
+    "SCHEMA_PATH_PREFIX_TRIM": True,
     "AUTHENTICATION_WHITELIST": None,
     "PREPROCESSING_HOOKS": [
         "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
     ],
     "TAGS": [
-        {"name": "Manage subscriptions"},
-        {"name": "List updates"},
+        {"name": "Beheren volgindicaties"},
+        {"name": "Raadplegen gewijzigde personen"},
     ],
 }
 
