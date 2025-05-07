@@ -37,7 +37,7 @@ audit_log = logging.getLogger("brp_kennisgevingen.audit")
 
 
 class IndexView(APIView):
-    """Having some response on the /kennisgevingen/v1/ path fixes the healthcheck."""
+    """Having some response on the /kennisgevingen/v1 path fixes the healthcheck."""
 
     def get(self, request):
         return Response(
@@ -273,10 +273,7 @@ class UpdatesAPIBaseView(BaseAPIView):
                 "burgerservicenummers": queryset.values_list(self.bsn_field, flat=True),
                 "_links": {
                     "self": {"href": self.request.get_full_path()},
-                    "ingeschrevenPersoon": {
-                        "href": "/ingeschrevenpersonen/{burgerservicenummer}",
-                        "templated": True,
-                    },
+                    "ingeschrevenPersoon": {"href": "/bevragingen/v1/personen"},
                 },
             }
         )

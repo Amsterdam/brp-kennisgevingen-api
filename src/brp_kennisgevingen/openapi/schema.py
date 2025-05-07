@@ -4,7 +4,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import exceptions, serializers, status
 
-from brp_kennisgevingen.api.serializers import SubscriptionSerializer, UpdatesSerializer
+from brp_kennisgevingen.kennisgevingen.serializers import SubscriptionSerializer, UpdatesSerializer
 from brp_kennisgevingen.views import STATUS_TO_URI
 
 
@@ -36,7 +36,7 @@ class AutoSchema(_AutoSchema):
 
 
 class JWTTokenScheme(OpenApiAuthenticationExtension):
-    target_class = "brp_kennisgevingen.api.authentication.JWTAuthentication"
+    target_class = "brp_kennisgevingen.kennisgevingen.authentication.JWTAuthentication"
     name = "JWTAuthentication"
 
     def get_security_definition(self, auto_schema):
@@ -229,33 +229,46 @@ default_error_responses_with_bad_request_start_date = {
 
 
 list_subscriptions_schema = extend_schema(
+    description="Vraag de actieve volgindicaties op van een abonnee. Levert geen "
+    "volgindicaties met einddatum vandaag of in het verleden.",
+    summary="Raadpleeg actieve volgindicaties",
     responses={
         200: SubscriptionSerializer,
         **default_error_responses,
     },
-    tags=["Manage subscriptions"],
+    tags=["Beheren volgindicaties"],
 )
 
 get_subscription_schema = extend_schema(
-    description="Get a subscription for a specific person.",
+    description="Vraag een volgindicatie op van een specifieke persoon.",
+    summary="Raadpleeg een volgindicatie op een persoon",
     responses={
         200: SubscriptionSerializer,
         **default_error_responses_with_bad_request_bsn,
     },
-    tags=["Manage subscriptions"],
+    tags=["Beheren volgindicaties"],
 )
 
 put_subscription_schema = extend_schema(
-    description="Create, update or delete subscriptions for a specific person.",
+    description="Plaats, wijzig of beëindig een volgindicatie op een specifieke persoon. Als "
+    "je de persoon nog niet volgt, wordt een volgindicatie geplaatst. Als je de "
+    "persoon al wel volgt, wordt de volgindicatie gewijzigd. Verwijder de einddatum "
+    "van een volgindicatie door in de request body een leeg object { } te sturen. "
+    "Beëindig een volgindicatie door een einddatum gelijk aan de datum van vandaag "
+    "te sturen.",
+    summary="Plaats, wijzig of beëindig een volgindicatie",
     responses={
         200: SubscriptionSerializer,
         201: SubscriptionSerializer,
         **default_error_responses_with_bad_request_bsn,
     },
-    tags=["Manage subscriptions"],
+    tags=["Beheren volgindicaties"],
 )
 
 list_updates_schema = extend_schema(
+    description="Vraag een lijst op met burgerservicenummers van personen met gewijzigde "
+    "gegevens.",
+    summary="Raadpleeg personen met gewijzigde gegevens",
     parameters=[
         OpenApiParameter(
             name="vanaf",
@@ -275,15 +288,13 @@ list_updates_schema = extend_schema(
                     value={
                         "_links": {
                             "self": {
-                                "href": "https://datapunt.voorbeeldgemeente.nl/api/"
-                                "v{major-versie}/resourcename/{resource-identificatie}",
+                                "href": "https://api.brp.amsterdam.nl/kennisgevingen"
+                                "v1/wijzigingen",
                                 "templated": True,
                                 "title": "string",
                             },
                             "ingeschrevenPersoon": {
-                                "href": "https://datapunt.voorbeeldgemeente.nl/api/"
-                                "v{major-versie}/resourcename/{resource-identificatie}",
-                                "templated": True,
+                                "href": "https://api.brp.amsterdam.nl/bevragingenv1/personen",
                                 "title": "string",
                             },
                         },
@@ -294,10 +305,13 @@ list_updates_schema = extend_schema(
         ),
         **default_error_responses_with_bad_request_start_date,
     },
-    tags=["List updates"],
+    tags=["Raadplegen gewijzigde personen"],
 )
 
 list_new_residents_schema = extend_schema(
+    description="Vraag een lijst op met burgerservicenummers van nieuwe ingezetenen van de "
+    "Gemeente Amsterdam.",
+    summary="Raadpleeg nieuwe ingezetenen van de Gemeente Amsterdam.",
     parameters=[
         OpenApiParameter(
             name="vanaf",
@@ -319,5 +333,5 @@ list_new_residents_schema = extend_schema(
         200: UpdatesSerializer,
         **default_error_responses_with_bad_request_start_date,
     },
-    tags=["List updates"],
+    tags=["Raadplegen gewijzigde personen"],
 )
