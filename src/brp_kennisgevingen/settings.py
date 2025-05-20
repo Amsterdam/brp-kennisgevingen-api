@@ -386,3 +386,5 @@ DATAPUNT_AUTHZ = {
     "ALWAYS_OK": False,
     "MIN_INTERVAL_KEYSET_UPDATE": 30 * 60,  # 30 minutes
 }
+
+MOCK_RECORDS_BSN = env.list("MOCK_RECORDS_BSN", cast=str, default=[])
