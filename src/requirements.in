@@ -8,7 +8,7 @@ drf-spectacular == 0.28.0
 psycopg2==2.9.10
 python-json-logger==3.3.0
 python-dateutil==2.9.0.post0
-requests == 2.32.3
+requests == 2.32.4
 whitenoise == 6.9.0
 
 # Monitoring
