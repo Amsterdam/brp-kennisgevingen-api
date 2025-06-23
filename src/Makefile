@@ -61,3 +61,13 @@ lint:                                  ## Report linting errors for all files
 	ruff check .
 
 ##
+## Fixtures:
+##
+
+migrate:
+	./manage.py migrate
+
+load_fixtures:  migrate                  ## Load initial data into database by django fixtures
+	./manage.py loaddata kennisgevingen.json
+
+##
