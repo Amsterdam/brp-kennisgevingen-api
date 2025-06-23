@@ -66,6 +66,7 @@ Deployment:
 * `CLOUD_ENV=azure` will enable Azure-specific telemetry.
 * `STATIC_URL` defines the base URL for static files (e.g. to point to a CDN).
 * `OAUTH_JWKS_URL` point to a public JSON Web Key Set, e.g. `https://login.microsoftonline.com/{tenant_uuid or 'common'}/discovery/v2.0/keys`.
+* `OAUTH_CHECK_CLAIMS` audience en issues checks for OAUTH
 
 Hardening deployment:
 
@@ -103,4 +104,34 @@ and will automatically activate the virtualenv when a `.python-version` file is 
 pyenv install 3.13.1
 pyenv virtualenv 3.13.1 brp-kennisgevingen-api
 echo brp-kennisgevingen-api > .python-version
+```
+
+## Test the application with mock data
+
+To be able to test the functionality of the API we've included some initial mock data to
+test some scenarios. First load the fixtures using:
+
+```shell
+cd src
+make load_fixtures
+```
+
+It is important to set environment variables for the OAUTH check claims to match the values in `get_token.py`:
+
+```shell
+export OAUTH_CHECK_CLAIMS="aud=0e1a03f2-4526-4159-a6dd-54236ad2006c,iss=https://issuer.test"
+```
+
+Retrieve a token using:
+
+```shell
+./get_token.py benk-brp-volgindicaties-api
+```
+
+And use this token in your API calls:
+
+```shell
+curl --request GET \
+  --url http://localhost:8096/kennisgevingen/v1/volgindicaties \
+  --header 'Authorization: Bearer ${token}'
 ```
