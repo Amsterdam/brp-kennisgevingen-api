@@ -252,7 +252,8 @@ class TestSubscriptionsView:
                 {
                     "name": "einddatum",
                     "code": "date",
-                    "reason": "Einddatum moet in de toekomst liggen.",
+                    "reason": "Voor een nieuwe volgindicatie kan de einddatum niet in "
+                    "het verleden liggen.",
                 }
             ],
         }
@@ -260,59 +261,6 @@ class TestSubscriptionsView:
         # Subscription should not exist
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
-
-        log_messages = caplog.messages
-        for log_message in [
-            (
-                "Access denied for 'update subscription' to 'test@example.com' on '999990019' "
-                "(full request/response in detail)"
-            ),
-        ]:
-            assert log_message in log_messages
-
-    @pytest.mark.django_db
-    def test_create_new_subscription_end_date_too_far(self, api_client, caplog):
-        url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
-
-        token = build_jwt_token(
-            [
-                "benk-brp-volgindicaties-api",
-            ]
-        )
-
-        data = {"einddatum": timezone.now().date() + timedelta(days=184)}
-
-        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-        assert response.status_code == 400
-        assert response.data == {
-            "detail": "The request could not be understood by the server due to malformed "
-            "syntax. The client SHOULD NOT repeat the request without modification.",
-            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
-            "title": "Geen correcte waarde opgegeven.",
-            "status": 400,
-            "code": "parseError",
-            "instance": "/kennisgevingen/v1/volgindicaties/999990019",
-            "invalidParams": [
-                {
-                    "code": "date",
-                    "name": "einddatum",
-                    "reason": "Einddatum mag maximaal 6 maanden in de toekomst liggen.",
-                }
-            ],
-        }
-
-        # Subscription should not exist
-        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
-        assert response.status_code == 404
-
-        log_messages = caplog.messages
-        for log_message in [
-            (
-                "Access denied for 'update subscription' to 'test@example.com' on '999990019' "
-                "(full request/response in detail)"
-            ),
-        ]:
-            assert log_message in log_messages
 
     @pytest.mark.django_db
     def test_create_new_subscription_empty_end_date(self, api_client, caplog):
@@ -335,7 +283,7 @@ class TestSubscriptionsView:
         assert response.data == {
             "begindatum": str(today),
             "burgerservicenummer": "999990019",
-            "einddatum": str(today + timedelta(days=182)),
+            "einddatum": None,
         }
 
     @pytest.mark.django_db
@@ -366,6 +314,62 @@ class TestSubscriptionsView:
             ),
         ]:
             assert log_message in log_messages
+
+    @pytest.mark.django_db
+    def test_remove_existing_active_subscription(self, api_client, subscriptions, caplog):
+        url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+
+        # Set the end date to today - 1 to stop the subscription
+        new_date = timezone.now().date() - timedelta(days=1)
+        data = {"einddatum": new_date}
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 200
+
+        # The subscription should not be available anymore
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 404
+
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "Access granted for 'update subscription' to 'test@example.com' on '999990019' "
+                "(full request/response in detail)"
+            ),
+        ]:
+            assert log_message in log_messages
+
+    @pytest.mark.django_db
+    def test_reactivate_expired_subscription(self, api_client, subscriptions, caplog):
+        url = reverse("subscriptions-detail", kwargs={"bsn": "999990147"})
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+
+        # The subscription should not be available
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 404
+
+        # Set the end date to a future date to create a new subscription
+        new_date = timezone.now().date() + timedelta(days=30)
+        data = {"einddatum": new_date}
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 201
+
+        # The subscription should be available again
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 200
+        assert response.data["einddatum"] == str(new_date)
 
 
 class TestUpdateViews:

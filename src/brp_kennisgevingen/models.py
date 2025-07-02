@@ -1,6 +1,7 @@
-from datetime import date, timedelta
+from datetime import date
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 
@@ -21,9 +22,11 @@ class SubscriptionManager(models.Manager):
 
     def active(self):
         today = timezone.now().date()
-        return self.filter(end_date__gt=today)
+        return self.filter(Q(end_date__gt=today) | Q(end_date__isnull=True))
 
-    def create_with_bsn(self, application_id: str, bsn: str, start_date: date, end_date: date):
+    def create_with_bsn(
+        self, application_id: str, bsn: str, start_date: date, end_date: date | None = None
+    ):
         # Make sure a BSN Mutation records exists
         _ = BSNMutation.objects.get_or_create(bsn=bsn)
         return self.create(
@@ -46,7 +49,7 @@ class Subscription(models.Model):
     application_id = models.CharField(max_length=255)
     bsn = models.CharField(max_length=9)
     start_date = models.DateField()
-    end_date = models.DateField()
+    end_date = models.DateField(null=True)
 
     objects = SubscriptionManager()
 
@@ -58,14 +61,13 @@ class Subscription(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk} {self.application_id} ({self.start_date}-{self.end_date})"
+        date_range = (
+            f"({self.start_date}-{self.end_date})" if self.end_date else f"({self.start_date}-)"
+        )
+        return f"{self.pk} {self.application_id} {date_range}"
 
     def set_end_date(self, end_date):
         today = timezone.now().date()
-        if end_date > today + timedelta(days=183):
-            raise SubscriptionTooLongException(
-                "End date cannot be further in the future than 183 days"
-            )
         self.end_date = end_date
 
         if not self.start_date:
