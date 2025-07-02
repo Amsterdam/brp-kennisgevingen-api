@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.utils import timezone
 from rest_framework import serializers
@@ -13,17 +13,7 @@ class SubscriptionSerializer(serializers.Serializer):
 
 
 class UpdateSubscriptionSerializer(serializers.Serializer):
-    einddatum = serializers.DateField(required=False)
-
-    def validate_einddatum(self, value):
-        today = timezone.now().date()
-        if value < today:
-            raise serializers.ValidationError("Einddatum moet in de toekomst liggen.")
-        if value > today + timedelta(days=183):
-            raise serializers.ValidationError(
-                "Einddatum mag maximaal 6 maanden in de toekomst liggen."
-            )
-        return value
+    einddatum = serializers.DateField(required=False, allow_null=True)
 
 
 class HalLinkSerializer(serializers.Serializer):

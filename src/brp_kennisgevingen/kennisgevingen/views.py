@@ -1,5 +1,4 @@
 import logging
-from datetime import timedelta
 from fnmatch import fnmatch
 
 from dateutil.relativedelta import relativedelta
@@ -17,7 +16,6 @@ from brp_kennisgevingen.models import (
     BSNMutation,
     NewResident,
     Subscription,
-    SubscriptionTooLongException,
 )
 from brp_kennisgevingen.openapi import schema
 
@@ -185,12 +183,31 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             self.log_access(request=request, msg=msg, bsn=bsn)
             raise_serializer_validation_error(serializer)
 
-        # Get the subscription end date or set it to the max allowed if no end_date is supplied
-        end_date = serializer.validated_data.get(
-            "einddatum", timezone.now().date() + timedelta(days=182)
-        )
+        # Get the optional subscription end date
+        end_date = serializer.validated_data.get("einddatum")
 
         if not instance:
+            if end_date and end_date < timezone.now().date():
+                msg = (
+                    "Access denied for 'update subscription' to '%(user)s' on '%(bsn)s'"
+                    " (full request/response in detail)"
+                )
+                self.log_access(request=request, msg=msg, bsn=bsn)
+                raise ProblemJsonException(
+                    title="Geen correcte waarde opgegeven.",
+                    detail="The request could not be understood by the server due to malformed "
+                    "syntax. The client SHOULD NOT repeat the request without modification.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                    invalid_params=[
+                        {
+                            "name": "einddatum",
+                            "code": "date",
+                            "reason": "Voor een nieuwe volgindicatie kan de einddatum niet in "
+                            "het verleden liggen.",
+                        }
+                    ],
+                )
+
             msg = (
                 "Access granted for 'new subscription' to '%(user)s' on '%(bsn)s'"
                 " (full request/response in detail)"
@@ -206,22 +223,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             serializer = SubscriptionSerializer(instance)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            try:
-                instance.set_end_date(end_date)
-            except SubscriptionTooLongException as err:
-                raise ProblemJsonException(
-                    title="Geen correcte waarde opgegeven.",
-                    detail="The request could not be understood by the server due to malformed "
-                    "syntax. The client SHOULD NOT repeat the request without modification.",
-                    status=status.HTTP_400_BAD_REQUEST,
-                    invalid_params=[
-                        {
-                            "name": "einddatum",
-                            "code": "date",
-                            "reason": "Einddatum mag maximaal 6 maanden in de toekomst liggen.",
-                        }
-                    ],
-                ) from err
+            instance.set_end_date(end_date)
 
             msg = (
                 "Access granted for 'update subscription' to '%(user)s' on '%(bsn)s'"
