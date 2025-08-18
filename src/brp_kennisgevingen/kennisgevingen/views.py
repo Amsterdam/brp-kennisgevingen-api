@@ -6,6 +6,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.urls import get_resolver
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from drf_spectacular.utils import extend_schema_view
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
@@ -61,6 +63,7 @@ def _extract_patterns(patterns, prefix, match):
     return urls
 
 
+@method_decorator(never_cache, name="dispatch")
 class BaseAPIView(APIView):
     needed_scopes: set = {"benk-brp-volgindicaties-api"}
 
