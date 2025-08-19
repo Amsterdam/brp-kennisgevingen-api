@@ -34,9 +34,9 @@ azure-core-tracing-opentelemetry==1.0.0b12 \
     --hash=sha256:38fd42709f1cc4bbc4f2797008b1c30a6a01617e49910c05daa3a0d0c65053ac \
     --hash=sha256:bb454142440bae11fd9d68c7c1d67ae38a1756ce808c5e4d736730a7b4b04144
     # via azure-monitor-opentelemetry
-azure-identity==1.23.0 \
-    --hash=sha256:d9cdcad39adb49d4bb2953a217f62aec1f65bbb3c63c9076da2be2a47e53dde4 \
-    --hash=sha256:dbbeb64b8e5eaa81c44c565f264b519ff2de7ff0e02271c49f3cb492762a50b0
+azure-identity==1.24.0 \
+    --hash=sha256:6c3a40b2a70af831e920b89e6421e8dcd4af78a0cb38b9642d86c67643d4930c \
+    --hash=sha256:9e04997cde0ab02ed66422c74748548e620b7b29361c72ce622acab0267ff7c4
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
@@ -330,9 +330,9 @@ cryptography==45.0.4 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==1.6.1 \
-    --hash=sha256:27565d59ed6ff3e3c83b6c04a09fcf76abff7a49b9b7ff5ad2319a9b580d4e7c \
-    --hash=sha256:c2ba6de31da21dd4e07419659a61bbaaa16588f403065174a42db71700882601
+datapunt-authorization-django==1.6.2 \
+    --hash=sha256:19f3ec1b942dce49ea92894866a6ccd5653f578899a0383bc466c5db8052f77a \
+    --hash=sha256:c3e2a256f105230e1a5a5b142f72894120e91e5fbb79d6f7a6465c86ccb21723
     # via -r requirements.in
 deprecated==1.2.18 \
     --hash=sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d \
@@ -340,9 +340,9 @@ deprecated==1.2.18 \
     # via
     #   opentelemetry-api
     #   opentelemetry-semantic-conventions
-django==5.2.3 \
-    --hash=sha256:335213277666ab2c5cac44a792a6d2f3d58eb79a80c14b6b160cd4afc3b75684 \
-    --hash=sha256:c517a6334e0fd940066aa9467b29401b93c37cec2e61365d663b80922542069d
+django==5.2.5 \
+    --hash=sha256:0745b25681b129a77aae3d4f6549b62d3913d74407831abaa0d9021a03954bae \
+    --hash=sha256:2b2ada0ee8a5ff743a40e2b9820d1f8e24c11bac9ae6469cd548f0057ea6ddcd
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
@@ -362,9 +362,9 @@ django-healthchecks==1.5.0 \
     --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
     --hash=sha256:25eb021a4a94240b28d996e82775ad6c3b392a2b262360b965a24b88fcfad78d
     # via -r requirements.in
-djangorestframework==3.16.0 \
-    --hash=sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361 \
-    --hash=sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9
+djangorestframework==3.16.1 \
+    --hash=sha256:166809528b1aced0a17dc66c24492af18049f2c9420dbd0be29422029cfc3ff7 \
+    --hash=sha256:33a59f47fb9c85ede792cbf88bde71893bcda0667bc573f784649521f1102cec
     # via
     #   -r requirements.in
     #   drf-spectacular
@@ -377,10 +377,6 @@ fixedint==0.1.6 \
     --hash=sha256:703005d090499d41ce7ce2ee7eae8f7a5589a81acdc6b79f1728a56495f2c799 \
     --hash=sha256:b8cf9f913735d2904deadda7a6daa9f57100599da1de57a7448ea1be75ae8c9c
     # via azure-monitor-opentelemetry-exporter
-freezegun==1.5.2 \
-    --hash=sha256:5aaf3ba229cda57afab5bd311f0108d86b6fb119ae89d2cd9c43ec8c1733c85b \
-    --hash=sha256:a54ae1d2f9c02dbf42e02c18a3ab95ab4295818b549a34dac55592d72a905181
-    # via -r requirements.in
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
@@ -613,9 +609,7 @@ pytest-django==4.11.1 \
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
-    # via
-    #   -r requirements.in
-    #   freezegun
+    # via -r requirements.in
 python-json-logger==3.3.0 \
     --hash=sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84 \
     --hash=sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7
@@ -685,9 +679,9 @@ referencing==0.36.2 \
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.4 \
-    --hash=sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c \
-    --hash=sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422
+requests==2.32.5 \
+    --hash=sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6 \
+    --hash=sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf
     # via
     #   -r requirements.in
     #   azure-core
