@@ -371,6 +371,40 @@ class TestSubscriptionsView:
         assert response.status_code == 200
         assert response.data["einddatum"] == str(new_date)
 
+    @pytest.mark.django_db
+    def test_send_multiple_updates(self, api_client, subscriptions, caplog):
+        url = reverse("subscriptions-detail", kwargs={"bsn": "999990147"})
+
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+
+        # The subscription should not be available
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 404
+
+        # Set the end date to a future date to create a new subscription
+        new_date = timezone.now().date() + timedelta(days=30)
+        data = {"einddatum": new_date}
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 201
+
+        # Remove the subscription by setting a date in the past
+        past_date = timezone.now().date() - timedelta(days=30)
+        data = {"einddatum": past_date}
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 200
+
+        # Set the end date to a future date to re-activate the subscription
+        data = {"einddatum": new_date}
+
+        response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
+        assert response.status_code == 200
+
 
 class TestUpdateViews:
 
