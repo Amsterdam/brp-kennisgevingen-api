@@ -24,6 +24,11 @@ class SubscriptionManager(models.Manager):
         today = timezone.now().date()
         return self.filter(Q(end_date__gt=today) | Q(end_date__isnull=True))
 
+    def updatable(self):
+        # Records which are updatable are either active or have a start date of today
+        today = timezone.now().date()
+        return self.filter(Q(end_date__gt=today) | Q(end_date__isnull=True) | Q(start_date=today))
+
     def create_with_bsn(
         self, application_id: str, bsn: str, start_date: date, end_date: date | None = None
     ):

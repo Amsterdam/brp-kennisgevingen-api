@@ -81,12 +81,20 @@ class BaseAPIView(APIView):
 
 
 class SubscriptionAppIDFilterMixin:
-    queryset = Subscription.objects.active()
+
     application_id: str = None
 
-    def get_queryset(self):
+    def get_queryset(self, for_update=False):
+        """
+        When updating records we'll also have to look for (inactive) records from the same day
+        to possibly re-activate them.
+        """
+        if for_update:
+            queryset = Subscription.objects.updatable()
+        else:
+            queryset = Subscription.objects.active()
         self.application_id = self.request.get_token_claims.get("sub")
-        return self.queryset.filter(application_id=self.application_id)
+        return queryset.filter(application_id=self.application_id)
 
 
 @extend_schema_view(get=schema.list_subscriptions_schema)
@@ -109,7 +117,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
     http_method_names: list[str] = ["get", "put"]
     lookup_field: str = "bsn"
 
-    def get_object(self) -> Subscription | None:
+    def get_object(self, for_update: bool = False) -> Subscription | None:
         bsn = self.kwargs[self.lookup_field]
         if not is_valid_bsn(bsn):
             raise ProblemJsonException(
@@ -126,7 +134,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
                 ],
             )
 
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset(for_update))
 
         try:
             instance = queryset.get(bsn=bsn)
@@ -175,7 +183,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
 
     def update(self, request, *args, **kwargs):
         bsn = self.kwargs["bsn"]
-        instance = self.get_object()
+        instance = self.get_object(for_update=True)
 
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
