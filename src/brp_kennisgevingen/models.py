@@ -50,6 +50,8 @@ class Subscription(models.Model):
     bsn = models.CharField(max_length=9)
     start_date = models.DateField()
     end_date = models.DateField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     objects = SubscriptionManager()
 
