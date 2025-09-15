@@ -85,7 +85,7 @@ class NewResident(models.Model):
     """
 
     bsn = models.CharField(max_length=9, unique=True, primary_key=True)
-    birthdate = models.DateTimeField(null=True)
+    birthdate = models.DateField(null=True)
     inserted_at = models.DateTimeField(null=True)
 
     def __str__(self):
