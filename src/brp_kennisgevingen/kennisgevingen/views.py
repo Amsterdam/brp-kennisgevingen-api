@@ -93,7 +93,7 @@ class SubscriptionAppIDFilterMixin:
             queryset = Subscription.objects.updatable()
         else:
             queryset = Subscription.objects.active()
-        self.application_id = self.request.get_token_claims.get("sub")
+        self.application_id = self.request.get_token_claims.get("appid")
         return queryset.filter(application_id=self.application_id)
 
 

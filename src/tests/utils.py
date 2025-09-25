@@ -27,14 +27,14 @@ def to_drf_request(api_request):
     return request
 
 
-def build_jwt_token(scopes, subject="test@example.com"):
+def build_jwt_token(scopes, subject="test@example.com", appid="application_id"):
     now = int(time.time())
 
     kid = "2aedafba-8170-4064-b704-ce92b7c89cc6"
     key = jwks.get_keyset().get_key(kid)
     token = JWT(
         header={"alg": "ES256", "kid": kid},
-        claims={"iat": now, "exp": now + 30, "scopes": scopes, "sub": subject},
+        claims={"iat": now, "exp": now + 30, "scopes": scopes, "sub": subject, "appid": appid},
     )
     token.make_signed_token(key)
     return token.serialize()

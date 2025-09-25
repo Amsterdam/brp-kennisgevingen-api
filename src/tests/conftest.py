@@ -58,25 +58,25 @@ def subscriptions() -> list[Subscription]:
 
     subscriptions = [
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "bsn": "999990019",
             "start_date": today,
             "end_date": today + timedelta(days=30),
         },
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "bsn": "999990093",
             "start_date": today,
             "end_date": today + timedelta(days=30),
         },
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "bsn": "999990147",
             "start_date": today - timedelta(days=30),
             "end_date": today - timedelta(days=5),
         },
         {
-            "application_id": "other@example.com",
+            "application_id": "other_application_id",
             "bsn": "999990147",
             "start_date": today,
             "end_date": today + timedelta(days=30),
