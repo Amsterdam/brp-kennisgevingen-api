@@ -22,6 +22,7 @@ claims = {
     "exp": now + valid,
     "scopes": scopes,
     "sub": "test@tester.nl",
+    "appid": "application_id",
     "aud": "0e1a03f2-4526-4159-a6dd-54236ad2006c",
     "iss": "https://issuer.test",
 }
