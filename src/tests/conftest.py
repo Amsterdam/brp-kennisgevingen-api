@@ -10,7 +10,7 @@ from django.utils import timezone
 from rest_framework.request import Request
 from rest_framework.test import APIClient, APIRequestFactory
 
-from brp_kennisgevingen.models import NewResident, Subscription
+from brp_kennisgevingen.models import BSNUpdate, NewResident, Subscription
 from tests.utils import api_request_with_scopes, to_drf_request
 
 HERE = Path(__file__).parent
@@ -158,5 +158,45 @@ def new_residents() -> list[NewResident]:
 
     for resident in new_residents:
         instances.append(NewResident.objects.create(**resident))
+
+    return instances
+
+
+@pytest.fixture()
+def bsn_updates() -> list[BSNUpdate]:
+    """ """
+    today = timezone.now()
+
+    bsn_updates = [
+        {
+            "application_id": "test@example.com",
+            "old_bsn": "999990019",
+            "new_bsn": "999990020",
+            "inserted_at": today - timedelta(days=10),
+        },
+        {
+            "application_id": "test@example.com",
+            "old_bsn": "999990093",
+            "new_bsn": "999990094",
+            "inserted_at": today - timedelta(days=10),
+        },
+        {
+            "application_id": "test@example.com",
+            "old_bsn": "999990147",
+            "new_bsn": "999990148",
+            "inserted_at": today - timedelta(days=15),
+        },
+        {
+            "application_id": "other@example.com",
+            "old_bsn": "999990155",
+            "new_bsn": "999990156",
+            "inserted_at": today - timedelta(days=10),
+        },
+    ]
+
+    instances = []
+
+    for bsn_update in bsn_updates:
+        instances.append(BSNUpdate.objects.create(**bsn_update))
 
     return instances

@@ -18,6 +18,21 @@ class BSNMutation(models.Model):
         return f"{self.pk} ({self.inserted_at})"
 
 
+class BSNUpdate(models.Model):
+    """
+    The BSN updates table contains all updated BSNs in the BRP for Amsterdam.
+    Includes the old BSN and the new BSN that the old one changed to.
+    """
+
+    application_id = models.CharField(max_length=255)
+    old_bsn = models.CharField(max_length=9, unique=True)
+    new_bsn = models.CharField(max_length=9, unique=True)
+    inserted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return f"Old BSN: {self.old_bsn}, new BSN: {self.new_bsn} ({self.inserted_at})"
+
+
 class SubscriptionManager(models.Manager):
 
     def active(self):

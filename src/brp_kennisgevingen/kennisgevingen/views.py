@@ -14,17 +14,14 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from brp_kennisgevingen.models import (
-    BSNMutation,
-    NewResident,
-    Subscription,
-)
+from brp_kennisgevingen.models import BSNMutation, BSNUpdate, NewResident, Subscription
 from brp_kennisgevingen.openapi import schema
 
 from . import authentication, permissions
 from .exceptions import ProblemJsonException, raise_serializer_validation_error
 from .renderers import HALJSONRenderer
 from .serializers import (
+    BSNUpdateSerializer,
     NewResidentsInputSerializer,
     SubscriptionSerializer,
     UpdatesInputSerializer,
@@ -281,6 +278,7 @@ class UpdatesAPIBaseView(BaseAPIView):
 
         queryset = self.filter_queryset(self.get_queryset())
 
+        # Moet ik dit ook gebruiken voor de BSN wijzigingen? En dan verwijzen naar de nieuwe BSN?
         serializer = UpdatesSerializer(
             {
                 "burgerservicenummers": queryset.values_list(self.bsn_field, flat=True),
@@ -337,3 +335,25 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
 
             return queryset.filter(**filter_kwargs)
         return queryset
+
+
+@extend_schema_view(get=schema.list_bsn_updates_schema)
+class BSNUpdatesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
+    """
+    Request a list of `burgerservicenummers` that changed into new `burgerservicenummers`.
+    We use the UpdatesAPIBaseView for the filter_queryset function.
+    """
+
+    queryset = BSNUpdate.objects.all()
+    serializer_class = BSNUpdateSerializer
+    input_serializer = UpdatesInputSerializer
+
+    # Dit is de bijna precies de get method van UpdatesAPIBaseView, enige verschil is de serializer
+    def get(self, request, *args, **kwargs):
+        # Validate URL query parameters
+        query_serializer = UpdatesInputSerializer(data=self.request.query_params)
+        if not query_serializer.is_valid():
+            raise_serializer_validation_error(query_serializer)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)

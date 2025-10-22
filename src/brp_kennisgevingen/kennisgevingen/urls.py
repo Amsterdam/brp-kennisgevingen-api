@@ -21,6 +21,7 @@ urlpatterns = [
     path(
         "v1/nieuwe-ingezetenen", views.NewResidentsListAPIView.as_view(), name="new-residents-list"
     ),
+    path("v1/bsn-wijzigingen", views.BSNUpdatesListAPIView.as_view(), name="bsn-updates-list"),
     path(
         "v1/schema",
         SpectacularSwaggerView.as_view(url_name="schema-json"),

@@ -1,1 +1,132 @@
-[{"model": "brp_kennisgevingen.bsnmutation", "pk": "100600505", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "100600517", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999970045", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999990792", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999990858", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999995273", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999995285", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.bsnmutation", "pk": "999996915", "fields": {"inserted_at": "2025-06-23T11:29:08.680Z"}}, {"model": "brp_kennisgevingen.subscription", "pk": 1, "fields": {"application_id": "test@tester.nl", "bsn": "100600517", "start_date": "2000-01-01", "end_date": "2099-12-22"}}, {"model": "brp_kennisgevingen.newresident", "pk": "100600505", "fields": {"birthdate": "2009-12-31T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "100600517", "fields": {"birthdate": "2005-01-31T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999970045", "fields": {"birthdate": "1995-03-31T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999990792", "fields": {"birthdate": "1990-04-30T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999990858", "fields": {"birthdate": "1975-07-31T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999995273", "fields": {"birthdate": "2000-02-29T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999995285", "fields": {"birthdate": "1985-05-31T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}, {"model": "brp_kennisgevingen.newresident", "pk": "999996915", "fields": {"birthdate": "1980-06-30T22:00:00Z", "inserted_at": "2025-06-23T11:29:08.699Z"}}]
+[
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "100600505",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "100600517",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999970045",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999990792",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999990858",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999995273",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999995285",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.bsnmutation",
+        "pk": "999996915",
+        "fields": {
+            "inserted_at": "2025-06-23T11:29:08.680Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.subscription",
+        "pk": 1,
+        "fields": {
+            "application_id": "test@tester.nl",
+            "bsn": "100600517",
+            "start_date": "2000-01-01",
+            "end_date": "2099-12-22"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "100600505",
+        "fields": {
+            "birthdate": "2009-12-31T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "100600517",
+        "fields": {
+            "birthdate": "2005-01-31T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999970045",
+        "fields": {
+            "birthdate": "1995-03-31T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999990792",
+        "fields": {
+            "birthdate": "1990-04-30T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999990858",
+        "fields": {
+            "birthdate": "1975-07-31T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999995273",
+        "fields": {
+            "birthdate": "2000-02-29T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999995285",
+        "fields": {
+            "birthdate": "1985-05-31T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    },
+    {
+        "model": "brp_kennisgevingen.newresident",
+        "pk": "999996915",
+        "fields": {
+            "birthdate": "1980-06-30T22:00:00Z",
+            "inserted_at": "2025-06-23T11:29:08.699Z"
+        }
+    }
+]
