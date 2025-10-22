@@ -406,6 +406,7 @@ class TestSubscriptionsView:
         assert response.status_code == 200
 
 
+# Hier komt dan ook mijn bsn-wijzigingen (naam vind ik niet goed, wijzigingen laat al bsns zien)
 class TestUpdateViews:
 
     @pytest.mark.parametrize(
@@ -639,3 +640,71 @@ class TestUpdateViews:
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
+
+    @pytest.mark.django_db
+    def test_bsn_updates_list_view_in_search_window(self, api_client, subscriptions, bsn_updates):
+        url = reverse("bsn-updates-list")
+        start_date = timezone.now().date() - timedelta(days=30)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data) == 3
+        assert not {inst["oud_bsn"] for inst in response.data}.intersection({"999990155"})
+
+    @pytest.mark.django_db
+    def test_bsn_updates_list_view_outside_search_window(
+        self, api_client, subscriptions, bsn_updates
+    ):
+        url = reverse("bsn-updates-list")
+        start_date = timezone.now().date() - timedelta(days=14)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data) == 2
+        assert not {inst["oud_bsn"] for inst in response.data}.intersection(
+            {"999990155", "999990147"}
+        )
+
+    @pytest.mark.django_db
+    def test_bsn_updates_list_missing_query_parameter(self, api_client):
+        url = reverse("bsn-updates-list")
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 400
+        assert response.data == {
+            "code": "parseError",
+            "detail": "The request could not be understood by the server due to malformed "
+            "syntax. The client SHOULD NOT repeat the request without modification.",
+            "status": 400,
+            "title": "Geen correcte waarde opgegeven.",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+            "instance": "/kennisgevingen/v1/bsn-wijzigingen",
+            "invalidParams": [
+                {
+                    "code": "date",
+                    "name": "vanaf",
+                    "reason": "This field is required.",
+                }
+            ],
+        }

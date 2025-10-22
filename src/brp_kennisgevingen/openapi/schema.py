@@ -4,7 +4,11 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import exceptions, serializers, status
 
-from brp_kennisgevingen.kennisgevingen.serializers import SubscriptionSerializer, UpdatesSerializer
+from brp_kennisgevingen.kennisgevingen.serializers import (
+    BSNUpdateSerializer,
+    SubscriptionSerializer,
+    UpdatesSerializer,
+)
 from brp_kennisgevingen.views import STATUS_TO_URI
 
 
@@ -305,7 +309,7 @@ list_updates_schema = extend_schema(
         ),
         **default_error_responses_with_bad_request_start_date,
     },
-    tags=["Raadplegen gewijzigde personen"],
+    tags=["Raadplegen wijzigingen"],
 )
 
 list_new_residents_schema = extend_schema(
@@ -314,6 +318,7 @@ list_new_residents_schema = extend_schema(
     summary="Raadpleeg nieuwe ingezetenen van de Gemeente Amsterdam.",
     parameters=[
         OpenApiParameter(
+            # Deze omschrijving moet nog worden aangepast naar de nieuw ingezetenen denk ik?
             name="vanaf",
             description="Alleen personen waarbij gegevens zijn gewijzigd op of na "
             "deze datum worden geleverd.",
@@ -330,8 +335,30 @@ list_new_residents_schema = extend_schema(
         ),
     ],
     responses={
+        # Deze ook?
         200: UpdatesSerializer,
         **default_error_responses_with_bad_request_start_date,
     },
-    tags=["Raadplegen gewijzigde personen"],
+    tags=["Raadplegen wijzigingen"],
+)
+
+list_bsn_updates_schema = extend_schema(
+    description="Vraag een lijst op met burgerservicenummers die gewijzigd zijn van de "
+    "Gemeente Amsterdam.",
+    summary="Raadpleeg gewijzigde burgerservicenummers van de Gemeente Amsterdam.",
+    parameters=[
+        OpenApiParameter(
+            name="vanaf",
+            description="Alleen personen waarvan het burgerservice nummer is gewijzigd op of na "
+            "deze datum worden geleverd.",
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+            required=True,
+        ),
+    ],
+    responses={
+        200: BSNUpdateSerializer,
+        **default_error_responses_with_bad_request_start_date,
+    },
+    tags=["Raadplegen wijzigingen"],
 )

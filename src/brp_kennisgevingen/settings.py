@@ -371,7 +371,7 @@ SPECTACULAR_SETTINGS = {
     ],
     "TAGS": [
         {"name": "Beheren volgindicaties"},
-        {"name": "Raadplegen gewijzigde personen"},
+        {"name": "Raadplegen wijzigingen"},
     ],
 }
 
