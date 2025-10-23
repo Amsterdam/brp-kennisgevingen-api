@@ -98,7 +98,7 @@ def subscription_today() -> Subscription:
     """
     today = timezone.now().date()
     subscription = {
-        "application_id": "test@example.com",
+        "application_id": "application_id",
         "bsn": "999990093",
         "start_date": today - timedelta(days=30),
         "end_date": today,
@@ -113,7 +113,7 @@ def subscription_past() -> Subscription:
     """
     today = timezone.now().date()
     subscription = {
-        "application_id": "test@example.com",
+        "application_id": "application_id",
         "bsn": "999990093",
         "start_date": today - timedelta(days=30),
         "end_date": today - timedelta(days=10),
@@ -169,25 +169,25 @@ def bsn_updates() -> list[BSNUpdate]:
 
     bsn_updates = [
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "old_bsn": "999990019",
             "new_bsn": "999990020",
             "inserted_at": today - timedelta(days=10),
         },
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "old_bsn": "999990093",
             "new_bsn": "999990094",
             "inserted_at": today - timedelta(days=10),
         },
         {
-            "application_id": "test@example.com",
+            "application_id": "application_id",
             "old_bsn": "999990147",
             "new_bsn": "999990148",
             "inserted_at": today - timedelta(days=15),
         },
         {
-            "application_id": "other@example.com",
+            "application_id": "other_application_id",
             "old_bsn": "999990155",
             "new_bsn": "999990156",
             "inserted_at": today - timedelta(days=10),
