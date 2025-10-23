@@ -338,7 +338,7 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
 
 
 @extend_schema_view(get=schema.list_bsn_updates_schema)
-class BSNUpdatesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
+class BSNUpdatesListAPIView(UpdatesAPIBaseView):
     """
     Request a list of `burgerservicenummers` that changed into new `burgerservicenummers`.
     We use the UpdatesAPIBaseView for the filter_queryset function.
@@ -357,3 +357,8 @@ class BSNUpdatesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
+    def get_queryset(self):
+        queryset = BSNUpdate.objects.all()
+        application_id = self.request.get_token_claims.get("appid")
+        return queryset.filter(application_id=application_id)
