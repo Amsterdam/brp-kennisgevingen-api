@@ -163,11 +163,11 @@ def new_residents() -> list[NewResident]:
 
 
 @pytest.fixture()
-def bsn_updates() -> list[BSNChange]:
+def bsn_changes() -> list[BSNChange]:
     """ """
     today = timezone.now()
 
-    bsn_updates = [
+    bsn_changes = [
         {
             "application_id": "application_id",
             "old_bsn": "999990019",
@@ -196,11 +196,18 @@ def bsn_updates() -> list[BSNChange]:
             "inserted_at": today - timedelta(days=10),
             "valid_from": today - timedelta(days=10),
         },
+        {
+            "application_id": "application_id",
+            "old_bsn": "999990267",
+            "new_bsn": "",
+            "inserted_at": today - timedelta(days=5),
+            "valid_from": today - timedelta(days=5),
+        },
     ]
 
     instances = []
 
-    for bsn_update in bsn_updates:
+    for bsn_update in bsn_changes:
         instances.append(BSNChange.objects.create(**bsn_update))
 
     return instances
