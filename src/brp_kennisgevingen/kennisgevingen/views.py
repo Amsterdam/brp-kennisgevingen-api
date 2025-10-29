@@ -14,14 +14,14 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from brp_kennisgevingen.models import BSNMutation, BSNUpdate, NewResident, Subscription
+from brp_kennisgevingen.models import BSNChange, BSNMutation, NewResident, Subscription
 from brp_kennisgevingen.openapi import schema
 
 from . import authentication, permissions
 from .exceptions import ProblemJsonException, raise_serializer_validation_error
 from .renderers import HALJSONRenderer
 from .serializers import (
-    BSNUpdateSerializer,
+    BSNChangesSerializer,
     NewResidentsInputSerializer,
     SubscriptionSerializer,
     UpdatesInputSerializer,
@@ -338,17 +338,16 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
 
 
 @extend_schema_view(get=schema.list_bsn_updates_schema)
-class BSNUpdatesListAPIView(UpdatesAPIBaseView):
+class BSNChangesListAPIView(UpdatesAPIBaseView):
     """
     Request a list of `burgerservicenummers` that changed into new `burgerservicenummers`.
     We use the UpdatesAPIBaseView for the filter_queryset function.
     """
 
-    queryset = BSNUpdate.objects.all()
-    serializer_class = BSNUpdateSerializer
+    queryset = BSNChange.objects.all()
+    serializer_class = BSNChangesSerializer
     input_serializer = UpdatesInputSerializer
 
-    # Dit is de bijna precies de get method van UpdatesAPIBaseView, enige verschil is de serializer
     def get(self, request, *args, **kwargs):
         # Validate URL query parameters
         query_serializer = UpdatesInputSerializer(data=self.request.query_params)
@@ -359,6 +358,6 @@ class BSNUpdatesListAPIView(UpdatesAPIBaseView):
         return Response(serializer.data)
 
     def get_queryset(self):
-        queryset = BSNUpdate.objects.all()
+        queryset = BSNChange.objects.all()
         application_id = self.request.get_token_claims.get("appid")
         return queryset.filter(application_id=application_id)

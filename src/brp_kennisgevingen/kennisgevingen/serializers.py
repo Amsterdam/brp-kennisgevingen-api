@@ -33,10 +33,13 @@ class UpdatesSerializer(serializers.Serializer):
     _links = UpdatesLinksSerializer()
 
 
-class BSNUpdateSerializer(serializers.Serializer):
+class BSNChangesSerializer(serializers.Serializer):
     oud_bsn = serializers.CharField(source="old_bsn")
     nieuw_bsn = serializers.CharField(source="new_bsn")
-    toegevoegd = serializers.DateTimeField(required=False, allow_null=True, source="inserted_at")
+    wijzigingsdatum = serializers.DateTimeField(
+        required=False, allow_null=True, source="inserted_at"
+    )
+    ingangsdatum = serializers.DateTimeField(required=False, allow_null=True, source="valid_from")
 
 
 class UpdatesInputSerializer(serializers.Serializer):
