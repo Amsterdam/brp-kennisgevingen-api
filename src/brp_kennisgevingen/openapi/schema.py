@@ -5,7 +5,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from rest_framework import exceptions, serializers, status
 
 from brp_kennisgevingen.kennisgevingen.serializers import (
-    BSNUpdateSerializer,
+    BSNChangesSerializer,
     SubscriptionSerializer,
     UpdatesSerializer,
 )
@@ -357,7 +357,7 @@ list_bsn_updates_schema = extend_schema(
         ),
     ],
     responses={
-        200: BSNUpdateSerializer,
+        200: BSNChangesSerializer,
         **default_error_responses_with_bad_request_start_date,
     },
     tags=["Raadplegen wijzigingen"],
