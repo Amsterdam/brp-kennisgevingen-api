@@ -34,8 +34,8 @@ class UpdatesSerializer(serializers.Serializer):
 
 
 class BSNChangesSerializer(serializers.Serializer):
-    oud_bsn = serializers.CharField(source="old_bsn")
-    nieuw_bsn = serializers.CharField(source="new_bsn")
+    burgerservicenummerOud = serializers.CharField(source="old_bsn")
+    burgerservicenummerNieuw = serializers.CharField(source="new_bsn")
     wijzigingsdatum = serializers.DateTimeField(
         required=False, allow_null=True, source="inserted_at"
     )

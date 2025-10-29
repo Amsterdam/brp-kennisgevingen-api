@@ -596,6 +596,7 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
+        print(response.data)
         assert len(response.data["burgerservicenummers"]) == 1
 
     @pytest.mark.django_db
@@ -642,8 +643,8 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
-    def test_bsn_updates_list_view_in_search_window(self, api_client, subscriptions, bsn_updates):
-        url = reverse("bsn-updates-list")
+    def test_bsn_changes_list_view_in_search_window(self, api_client, subscriptions, bsn_changes):
+        url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
         query_params = {
             "vanaf": start_date,
@@ -656,14 +657,16 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        assert len(response.data) == 3
-        assert not {inst["oud_bsn"] for inst in response.data}.intersection({"999990155"})
+        assert len(response.data) == 4
+        assert not {inst["burgerservicenummerOud"] for inst in response.data}.intersection(
+            {"999990155"}
+        )
 
     @pytest.mark.django_db
-    def test_bsn_updates_list_view_outside_search_window(
-        self, api_client, subscriptions, bsn_updates
+    def test_bsn_changes_list_view_outside_search_window(
+        self, api_client, subscriptions, bsn_changes
     ):
-        url = reverse("bsn-updates-list")
+        url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=14)
         query_params = {
             "vanaf": start_date,
@@ -676,14 +679,35 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        assert len(response.data) == 2
-        assert not {inst["oud_bsn"] for inst in response.data}.intersection(
+        print(response.data)
+        assert len(response.data) == 3
+        assert not {inst["burgerservicenummerOud"] for inst in response.data}.intersection(
             {"999990155", "999990147"}
         )
 
     @pytest.mark.django_db
-    def test_bsn_updates_list_missing_query_parameter(self, api_client):
-        url = reverse("bsn-updates-list")
+    def test_bsn_changes_list_view_empty_new_bsn(self, api_client, subscriptions, bsn_changes):
+        url = reverse("bsn-changes-list")
+        start_date = timezone.now().date() - timedelta(days=5)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        print(response.data)
+        assert len(response.data) == 1
+        assert response.data[0]["burgerservicenummerOud"] == "999990267"
+        assert response.data[0]["burgerservicenummerNieuw"] == ""
+
+    @pytest.mark.django_db
+    def test_bsn_changes_list_missing_query_parameter(self, api_client):
+        url = reverse("bsn-changes-list")
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties-api",
