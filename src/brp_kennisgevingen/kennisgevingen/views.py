@@ -21,6 +21,7 @@ from . import authentication, permissions
 from .exceptions import ProblemJsonException, raise_serializer_validation_error
 from .renderers import HALJSONRenderer
 from .serializers import (
+    BSNChangesListSerializer,
     BSNChangesSerializer,
     NewResidentsInputSerializer,
     SubscriptionSerializer,
@@ -278,7 +279,6 @@ class UpdatesAPIBaseView(BaseAPIView):
 
         queryset = self.filter_queryset(self.get_queryset())
 
-        # Moet ik dit ook gebruiken voor de BSN wijzigingen? En dan verwijzen naar de nieuwe BSN?
         serializer = UpdatesSerializer(
             {
                 "burgerservicenummers": queryset.values_list(self.bsn_field, flat=True),
@@ -337,7 +337,7 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
         return queryset
 
 
-@extend_schema_view(get=schema.list_bsn_updates_schema)
+# @extend_schema_view(get=schema.list_bsn_updates_schema)
 class BSNChangesListAPIView(UpdatesAPIBaseView):
     """
     Request a list of `burgerservicenummers` that changed into new `burgerservicenummers`.
@@ -354,7 +354,15 @@ class BSNChangesListAPIView(UpdatesAPIBaseView):
         if not query_serializer.is_valid():
             raise_serializer_validation_error(query_serializer)
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = BSNChangesListSerializer(
+            {
+                "bsnWijzigingen": BSNChangesSerializer(queryset, many=True).data,
+                "_links": {
+                    "self": {"href": self.request.get_full_path()},
+                    "ingeschrevenPersoon": {"href": "/bevragingen/v1/personen"},
+                },
+            }
+        )
         return Response(serializer.data)
 
     def get_queryset(self):

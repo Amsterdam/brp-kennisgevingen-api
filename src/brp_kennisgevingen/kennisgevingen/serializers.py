@@ -42,6 +42,11 @@ class BSNChangesSerializer(serializers.Serializer):
     ingangsdatum = serializers.DateTimeField(required=False, allow_null=True, source="valid_from")
 
 
+class BSNChangesListSerializer(serializers.Serializer):
+    bsnWijzigingen = serializers.ListField(child=serializers.DictField())
+    _links = UpdatesLinksSerializer()
+
+
 class UpdatesInputSerializer(serializers.Serializer):
     vanaf = serializers.DateField()
 

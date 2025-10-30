@@ -657,10 +657,10 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        assert len(response.data) == 4
-        assert not {inst["burgerservicenummerOud"] for inst in response.data}.intersection(
-            {"999990155"}
-        )
+        assert len(response.data["bsnWijzigingen"]) == 4
+        assert not {
+            inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
+        }.intersection({"999990155"})
 
     @pytest.mark.django_db
     def test_bsn_changes_list_view_outside_search_window(
@@ -680,10 +680,10 @@ class TestUpdateViews:
 
         assert response.status_code == 200
         print(response.data)
-        assert len(response.data) == 3
-        assert not {inst["burgerservicenummerOud"] for inst in response.data}.intersection(
-            {"999990155", "999990147"}
-        )
+        assert len(response.data["bsnWijzigingen"]) == 3
+        assert not {
+            inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
+        }.intersection({"999990155", "999990147"})
 
     @pytest.mark.django_db
     def test_bsn_changes_list_view_empty_new_bsn(self, api_client, subscriptions, bsn_changes):
@@ -700,10 +700,9 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        print(response.data)
-        assert len(response.data) == 1
-        assert response.data[0]["burgerservicenummerOud"] == "999990267"
-        assert response.data[0]["burgerservicenummerNieuw"] == ""
+        assert len(response.data["bsnWijzigingen"]) == 1
+        assert response.data["bsnWijzigingen"][0]["burgerservicenummerOud"] == "999990267"
+        assert response.data["bsnWijzigingen"][0]["burgerservicenummerNieuw"] == ""
 
     @pytest.mark.django_db
     def test_bsn_changes_list_missing_query_parameter(self, api_client):
