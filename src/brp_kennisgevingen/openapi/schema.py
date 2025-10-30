@@ -5,7 +5,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from rest_framework import exceptions, serializers, status
 
 from brp_kennisgevingen.kennisgevingen.serializers import (
-    BSNChangesSerializer,
+    BSNChangesListSerializer,
     SubscriptionSerializer,
     UpdatesSerializer,
 )
@@ -318,7 +318,6 @@ list_new_residents_schema = extend_schema(
     summary="Raadpleeg nieuwe ingezetenen van de Gemeente Amsterdam.",
     parameters=[
         OpenApiParameter(
-            # Deze omschrijving moet nog worden aangepast naar de nieuw ingezetenen denk ik?
             name="vanaf",
             description="Alleen personen waarbij gegevens zijn gewijzigd op of na "
             "deze datum worden geleverd.",
@@ -335,7 +334,6 @@ list_new_residents_schema = extend_schema(
         ),
     ],
     responses={
-        # Deze ook?
         200: UpdatesSerializer,
         **default_error_responses_with_bad_request_start_date,
     },
@@ -357,7 +355,7 @@ list_bsn_updates_schema = extend_schema(
         ),
     ],
     responses={
-        200: BSNChangesSerializer,
+        200: BSNChangesListSerializer,
         **default_error_responses_with_bad_request_start_date,
     },
     tags=["Raadplegen wijzigingen"],
