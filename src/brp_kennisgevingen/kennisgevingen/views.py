@@ -22,7 +22,6 @@ from .exceptions import ProblemJsonException, raise_serializer_validation_error
 from .renderers import HALJSONRenderer
 from .serializers import (
     BSNChangesListSerializer,
-    BSNChangesSerializer,
     NewResidentsInputSerializer,
     SubscriptionSerializer,
     UpdatesInputSerializer,
@@ -345,7 +344,6 @@ class BSNChangesListAPIView(UpdatesAPIBaseView):
     """
 
     queryset = BSNChange.objects.all()
-    serializer_class = BSNChangesSerializer
     input_serializer = UpdatesInputSerializer
 
     def get(self, request, *args, **kwargs):
@@ -356,7 +354,7 @@ class BSNChangesListAPIView(UpdatesAPIBaseView):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = BSNChangesListSerializer(
             {
-                "bsnWijzigingen": BSNChangesSerializer(queryset, many=True).data,
+                "bsnWijzigingen": queryset,
                 "_links": {
                     "self": {"href": self.request.get_full_path()},
                     "ingeschrevenPersoon": {"href": "/bevragingen/v1/personen"},
@@ -366,6 +364,5 @@ class BSNChangesListAPIView(UpdatesAPIBaseView):
         return Response(serializer.data)
 
     def get_queryset(self):
-        queryset = BSNChange.objects.all()
         application_id = self.request.get_token_claims.get("appid")
-        return queryset.filter(application_id=application_id)
+        return self.queryset.filter(application_id=application_id)
