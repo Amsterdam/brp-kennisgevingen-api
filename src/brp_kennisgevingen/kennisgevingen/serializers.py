@@ -43,7 +43,7 @@ class BSNChangesSerializer(serializers.Serializer):
 
 
 class BSNChangesListSerializer(serializers.Serializer):
-    bsnWijzigingen = serializers.ListField(child=serializers.DictField())
+    bsnWijzigingen = BSNChangesSerializer(many=True)
     _links = UpdatesLinksSerializer()
 
 

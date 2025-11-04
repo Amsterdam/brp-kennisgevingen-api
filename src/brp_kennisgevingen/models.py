@@ -31,7 +31,7 @@ class BSNChange(models.Model):
     valid_from = models.DateTimeField()
 
     def __str__(self):
-        return f"Old BSN: {self.old_bsn}, new BSN: {self.new_bsn}"
+        return f"old BSN: {self.old_bsn}, new BSN: {self.new_bsn}"
 
 
 class SubscriptionManager(models.Manager):
