@@ -406,7 +406,6 @@ class TestSubscriptionsView:
         assert response.status_code == 200
 
 
-# Hier komt dan ook mijn bsn-wijzigingen (naam vind ik niet goed, wijzigingen laat al bsns zien)
 class TestUpdateViews:
 
     @pytest.mark.parametrize(
@@ -596,7 +595,6 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        print(response.data)
         assert len(response.data["burgerservicenummers"]) == 1
 
     @pytest.mark.django_db
@@ -679,7 +677,6 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        print(response.data)
         assert len(response.data["bsnWijzigingen"]) == 3
         assert not {
             inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
