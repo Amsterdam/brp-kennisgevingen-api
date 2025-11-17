@@ -34,9 +34,9 @@ azure-core-tracing-opentelemetry==1.0.0b12 \
     --hash=sha256:38fd42709f1cc4bbc4f2797008b1c30a6a01617e49910c05daa3a0d0c65053ac \
     --hash=sha256:bb454142440bae11fd9d68c7c1d67ae38a1756ce808c5e4d736730a7b4b04144
     # via azure-monitor-opentelemetry
-azure-identity==1.25.0 \
-    --hash=sha256:4177df34d684cddc026e6cf684e1abb57767aa9d84e7f2129b080ec45eee7733 \
-    --hash=sha256:becaec086bbdf8d1a6aa4fb080c2772a0f824a97d50c29637ec8cc4933f1e82d
+azure-identity==1.25.1 \
+    --hash=sha256:87ca8328883de6036443e1c37b40e8dc8fb74898240f61071e09d2e369361456 \
+    --hash=sha256:e9edd720af03dff020223cd269fa3a61e8f345ea75443858273bcb44844ab651
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
@@ -405,9 +405,9 @@ djangorestframework==3.16.1 \
     # via
     #   -r requirements.in
     #   drf-spectacular
-drf-spectacular==0.28.0 \
-    --hash=sha256:2c778a47a40ab2f5078a7c42e82baba07397bb35b074ae4680721b2805943061 \
-    --hash=sha256:856e7edf1056e49a4245e87a61e8da4baff46c83dbc25be1da2df77f354c7cb4
+drf-spectacular==0.29.0 \
+    --hash=sha256:0a069339ea390ce7f14a75e8b5af4a0860a46e833fd4af027411a3e94fc1a0cc \
+    --hash=sha256:d1ee7c9535d89848affb4427347f7c4a22c5d22530b8842ef133d7b72e19b41a
     # via -r requirements.in
 fixedint==0.1.6 \
     --hash=sha256:41953193f08cbe984f584d8513c38fe5eea5fbd392257433b2210391c8a21ead \
@@ -602,17 +602,21 @@ psutil==7.0.0 \
     --hash=sha256:a5f098451abc2828f7dc6b58d44b532b22f2088f4999a937557b603ce72b1993 \
     --hash=sha256:ba3fcef7523064a6c9da440fc4d6bd07da93ac726b5733c29027d7dc95b39d99
     # via azure-monitor-opentelemetry-exporter
-psycopg2==2.9.10 \
-    --hash=sha256:0435034157049f6846e95103bd8f5a668788dd913a7c30162ca9503fdf542cb4 \
-    --hash=sha256:12ec0b40b0273f95296233e8750441339298e6a572f7039da5b260e3c8b60e11 \
-    --hash=sha256:47c4f9875125344f4c2b870e41b6aad585901318068acd01de93f3677a6522c2 \
-    --hash=sha256:4a579d6243da40a7b3182e0430493dbd55950c493d8c68f4eec0b302f6bbf20e \
-    --hash=sha256:5df2b672140f95adb453af93a7d669d7a7bf0a56bcd26f1502329166f4a61716 \
-    --hash=sha256:65a63d7ab0e067e2cdb3cf266de39663203d38d6a8ed97f5ca0cb315c73fe067 \
-    --hash=sha256:88138c8dedcbfa96408023ea2b0c369eda40fe5d75002c0964c78f46f11fa442 \
-    --hash=sha256:91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2 \
-    --hash=sha256:9d5b3b94b79a844a986d029eee38998232451119ad653aea42bb9220a8c5066b \
-    --hash=sha256:c6f7b8561225f9e711a9c47087388a97fdc948211c10a4bccbf0ba68ab7b3b5a
+psycopg2==2.9.11 \
+    --hash=sha256:103e857f46bb76908768ead4e2d0ba1d1a130e7b8ed77d3ae91e8b33481813e8 \
+    --hash=sha256:103e857f46bb76908768ead4e2d0ba1d1a130e7b8ed77d3ae91e8b33481813e8 \
+    --hash=sha256:210daed32e18f35e3140a1ebe059ac29209dd96468f2f7559aa59f75ee82a5cb \
+    --hash=sha256:210daed32e18f35e3140a1ebe059ac29209dd96468f2f7559aa59f75ee82a5cb \
+    --hash=sha256:6ecddcf573777536bddfefaea8079ce959287798c8f5804bee6933635d538924 \
+    --hash=sha256:6ecddcf573777536bddfefaea8079ce959287798c8f5804bee6933635d538924 \
+    --hash=sha256:8dc379166b5b7d5ea66dcebf433011dfc51a7bb8a5fc12367fa05668e5fc53c8 \
+    --hash=sha256:8dc379166b5b7d5ea66dcebf433011dfc51a7bb8a5fc12367fa05668e5fc53c8 \
+    --hash=sha256:964d31caf728e217c697ff77ea69c2ba0865fa41ec20bb00f0977e62fdcc52e3 \
+    --hash=sha256:964d31caf728e217c697ff77ea69c2ba0865fa41ec20bb00f0977e62fdcc52e3 \
+    --hash=sha256:e03e4a6dbe87ff81540b434f2e5dc2bddad10296db5eea7bdc995bf5f4162938 \
+    --hash=sha256:e03e4a6dbe87ff81540b434f2e5dc2bddad10296db5eea7bdc995bf5f4162938 \
+    --hash=sha256:f10a48acba5fe6e312b891f290b4d2ca595fc9a06850fe53320beac353575578 \
+    --hash=sha256:f10a48acba5fe6e312b891f290b4d2ca595fc9a06850fe53320beac353575578
     # via -r requirements.in
 pycparser==2.22 \
     --hash=sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6 \
