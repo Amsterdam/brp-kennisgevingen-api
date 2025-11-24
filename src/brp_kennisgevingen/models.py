@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -44,18 +42,6 @@ class SubscriptionManager(models.Manager):
         # Records which are updatable are either active or have a start date of today
         today = timezone.now().date()
         return self.filter(Q(end_date__gt=today) | Q(end_date__isnull=True) | Q(start_date=today))
-
-    def create_with_bsn(
-        self, application_id: str, bsn: str, start_date: date, end_date: date | None = None
-    ):
-        # Make sure a BSN Mutation records exists
-        _ = BSNMutation.objects.get_or_create(bsn=bsn)
-        return self.create(
-            application_id=application_id,
-            bsn=bsn,
-            start_date=start_date,
-            end_date=end_date,
-        )
 
 
 class SubscriptionTooLongException(Exception):
