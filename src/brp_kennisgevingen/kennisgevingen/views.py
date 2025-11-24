@@ -222,7 +222,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             )
             self.log_access(request=request, msg=msg, bsn=bsn)
 
-            instance = Subscription.objects.create_with_bsn(
+            instance = Subscription.objects.create(
                 application_id=self.application_id,
                 bsn=bsn,
                 start_date=timezone.now().date(),

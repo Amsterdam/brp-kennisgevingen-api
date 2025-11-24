@@ -1,10 +1,13 @@
 import time
+from datetime import date
 
 from authorization_django import jwks
 from jwcrypto.jwt import JWT
 from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
+
+from brp_kennisgevingen.models import BSNMutation, Subscription
 
 
 def api_request_with_scopes(scopes: list[str], data=None) -> Request:
@@ -38,3 +41,16 @@ def build_jwt_token(scopes, subject="test@example.com", appid="application_id"):
     )
     token.make_signed_token(key)
     return token.serialize()
+
+
+def create_subscription_with_bsn(
+    application_id: str, bsn: str, start_date: date, end_date: date | None = None
+):
+    # Make sure a BSN Mutation records exists
+    _ = BSNMutation.objects.get_or_create(bsn=bsn)
+    return Subscription.objects.create(
+        application_id=application_id,
+        bsn=bsn,
+        start_date=start_date,
+        end_date=end_date,
+    )

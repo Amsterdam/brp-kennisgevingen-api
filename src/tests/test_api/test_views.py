@@ -517,7 +517,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
         # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
+        bsn_mutation = BSNMutation.objects.create(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )
@@ -543,8 +543,8 @@ class TestUpdateViews:
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
-        # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
+        # Create a mutation with a date of an active subscription and expect bsn to be returned
+        bsn_mutation = BSNMutation.objects.create(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )
@@ -570,8 +570,8 @@ class TestUpdateViews:
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
-        # Set the mutation date of an active subscription and expect bsn to be returned
-        bsn_mutation = BSNMutation.objects.get(bsn=subscriptions[0].bsn)
+        # Create a mutation date of an active subscription and expect bsn to be returned
+        bsn_mutation = BSNMutation.objects.create(bsn=subscriptions[0].bsn)
         timezone_aware_start_date = datetime.combine(start_date, datetime.min.time()).replace(
             tzinfo=timezone.get_current_timezone()
         )

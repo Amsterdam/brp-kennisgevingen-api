@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.test import APIClient, APIRequestFactory
 
 from brp_kennisgevingen.models import BSNChange, NewResident, Subscription
-from tests.utils import api_request_with_scopes, to_drf_request
+from tests.utils import api_request_with_scopes, create_subscription_with_bsn, to_drf_request
 
 HERE = Path(__file__).parent
 
@@ -86,7 +86,7 @@ def subscriptions() -> list[Subscription]:
     instances = []
 
     for subscription in subscriptions:
-        instances.append(Subscription.objects.create_with_bsn(**subscription))
+        instances.append(Subscription.objects.create(**subscription))
 
     return instances
 
@@ -103,7 +103,7 @@ def subscription_today() -> Subscription:
         "start_date": today - timedelta(days=30),
         "end_date": today,
     }
-    return Subscription.objects.create_with_bsn(**subscription)
+    return create_subscription_with_bsn(**subscription)
 
 
 @pytest.fixture()
@@ -118,7 +118,7 @@ def subscription_past() -> Subscription:
         "start_date": today - timedelta(days=30),
         "end_date": today - timedelta(days=10),
     }
-    return Subscription.objects.create_with_bsn(**subscription)
+    return create_subscription_with_bsn(**subscription)
 
 
 @pytest.fixture()
