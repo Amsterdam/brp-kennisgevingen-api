@@ -23,8 +23,8 @@ class BSNChange(models.Model):
     """
 
     application_id = models.CharField(max_length=255)
-    old_bsn = models.CharField(max_length=9, unique=True)
-    new_bsn = models.CharField(max_length=9, unique=True, null=True)
+    old_bsn = models.CharField(max_length=9)
+    new_bsn = models.CharField(max_length=9, null=True)
     inserted_at = models.DateTimeField()
     valid_from = models.DateTimeField()
 
