@@ -87,9 +87,9 @@ class TestSubscriptionsView:
 
         # We expect two records, since the other subscriptions are either inactive
         # or linked to another application_id
-        assert len(response.data) == 2
+        assert len(response.data) == 3
         for record in response.data:
-            assert record["burgerservicenummer"] in ["999990019", "999990093"]
+            assert record["burgerservicenummer"] in ["999990019", "999990093", "999990267"]
 
     @pytest.mark.django_db
     def test_subscriptions_ending_today_are_not_returned(self, api_client, subscription_today):
@@ -655,7 +655,7 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        assert len(response.data["bsnWijzigingen"]) == 4
+        assert len(response.data["bsnWijzigingen"]) == 3
         assert not {
             inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
         }.intersection({"999990155"})
@@ -677,10 +677,10 @@ class TestUpdateViews:
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
-        assert len(response.data["bsnWijzigingen"]) == 3
+        assert len(response.data["bsnWijzigingen"]) == 2
         assert not {
             inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
-        }.intersection({"999990155", "999990147"})
+        }.intersection({"999990155", "999990093"})
 
     @pytest.mark.django_db
     def test_bsn_changes_list_view_empty_new_bsn(self, api_client, subscriptions, bsn_changes):
