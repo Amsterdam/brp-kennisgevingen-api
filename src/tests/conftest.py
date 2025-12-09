@@ -81,6 +81,12 @@ def subscriptions() -> list[Subscription]:
             "start_date": today,
             "end_date": today + timedelta(days=30),
         },
+        {
+            "application_id": "application_id",
+            "bsn": "999990267",
+            "start_date": today,
+            "end_date": today + timedelta(days=30),
+        },
     ]
 
     instances = []
@@ -169,35 +175,24 @@ def bsn_changes() -> list[BSNChange]:
 
     bsn_changes = [
         {
-            "application_id": "application_id",
             "old_bsn": "999990019",
             "new_bsn": "999990020",
             "inserted_at": today - timedelta(days=10),
             "valid_from": today - timedelta(days=10),
         },
         {
-            "application_id": "application_id",
             "old_bsn": "999990093",
             "new_bsn": "999990094",
-            "inserted_at": today - timedelta(days=10),
-            "valid_from": today - timedelta(days=10),
-        },
-        {
-            "application_id": "application_id",
-            "old_bsn": "999990147",
-            "new_bsn": "999990148",
             "inserted_at": today - timedelta(days=15),
             "valid_from": today - timedelta(days=15),
         },
         {
-            "application_id": "other_application_id",
             "old_bsn": "999990155",
             "new_bsn": "999990156",
             "inserted_at": today - timedelta(days=10),
             "valid_from": today - timedelta(days=10),
         },
         {
-            "application_id": "application_id",
             "old_bsn": "999990267",
             "new_bsn": "",
             "inserted_at": today - timedelta(days=5),
