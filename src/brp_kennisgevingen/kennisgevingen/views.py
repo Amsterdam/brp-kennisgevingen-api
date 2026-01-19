@@ -343,6 +343,7 @@ class BSNChangesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     We use the UpdatesAPIBaseView for the filter_queryset function.
     """
 
+    needed_scopes: set = {"benk-brp-bsn-wijzigingen-api"}
     input_serializer = UpdatesInputSerializer
 
     def get(self, request, *args, **kwargs):

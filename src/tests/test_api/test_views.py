@@ -641,7 +641,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
-    def test_bsn_changes_list_view_in_search_window(self, api_client, subscriptions, bsn_changes):
+    def test_bsn_changes_incorrect_scope(self, api_client, subscriptions, bsn_changes):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
         query_params = {
@@ -650,6 +650,22 @@ class TestUpdateViews:
         token = build_jwt_token(
             [
                 "benk-brp-volgindicaties-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 403
+
+    @pytest.mark.django_db
+    def test_bsn_changes_list_view_in_search_window(self, api_client, subscriptions, bsn_changes):
+        url = reverse("bsn-changes-list")
+        start_date = timezone.now().date() - timedelta(days=30)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-bsn-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -671,7 +687,7 @@ class TestUpdateViews:
         }
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-bsn-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -691,7 +707,7 @@ class TestUpdateViews:
         }
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-bsn-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -706,7 +722,7 @@ class TestUpdateViews:
         url = reverse("bsn-changes-list")
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-bsn-wijzigingen-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
