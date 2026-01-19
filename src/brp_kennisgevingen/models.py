@@ -25,7 +25,7 @@ class BSNChange(models.Model):
     old_bsn = models.CharField(max_length=9)
     new_bsn = models.CharField(max_length=9, null=True)
     inserted_at = models.DateTimeField()
-    valid_from = models.DateTimeField()
+    valid_from = models.DateField()
 
     def __str__(self):
         return f"old BSN: {self.old_bsn}, new BSN: {self.new_bsn}"
