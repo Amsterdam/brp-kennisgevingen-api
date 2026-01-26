@@ -7,12 +7,12 @@ pip-tools==7.5.2
 # Linting
 pre-commit==4.5.1
 black==26.1.0
-ruff==0.14.13
+ruff==0.14.14
 
 # Testing
 pytest-sugar==1.1.1
 termcolor==3.3.0
 
 # Debugging
-django-debug-toolbar==6.1.0
+django-debug-toolbar==6.2.0
 django-extensions==4.1
