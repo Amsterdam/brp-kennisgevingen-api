@@ -396,9 +396,9 @@ cryptography==46.0.5 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==1.7.0 \
-    --hash=sha256:3791618204ca1b89938eabfe7c3f41f5a1ae72ea8709c3eaf734ff1e9e9bc355 \
-    --hash=sha256:70f3bffb4c8925862c0d599f290889644ed4e8124f185a979fa111afa267b13e
+datapunt-authorization-django==1.8.0 \
+    --hash=sha256:4294d0d4850b066a92776dff72f60c611536690f829e2d19d8cb9b5a9abc8352 \
+    --hash=sha256:76d495a875357d6c45fcfbc981e0f18ce419b73548187b7d586fb750b41f591f
     # via -r requirements.in
 deprecated==1.2.18 \
     --hash=sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d \
