@@ -2,12 +2,12 @@
 
 # Packaging
 pur == 7.3.3
-pip-tools==7.5.2
+pip-tools==7.5.3
 
 # Linting
 pre-commit==4.5.1
 black==26.1.0
-ruff==0.15.0
+ruff==0.15.1
 
 # Testing
 pytest-sugar==1.1.1
