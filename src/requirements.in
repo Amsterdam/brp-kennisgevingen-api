@@ -1,5 +1,5 @@
 Django == 5.2.11
-django-environ == 0.12.1
+django-environ == 0.13.0
 django-cors-headers == 4.9.0
 django-healthchecks == 1.5.0
 datapunt-authorization-django == 2.0.0
