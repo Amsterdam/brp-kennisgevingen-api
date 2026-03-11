@@ -22,7 +22,7 @@ class BSNChange(models.Model):
     Includes the old BSN and the new BSN that the old one changed to.
     """
 
-    old_bsn = models.CharField(max_length=9)
+    old_bsn = models.CharField(max_length=9, unique=True, primary_key=True)
     new_bsn = models.CharField(max_length=9, null=True)
     inserted_at = models.DateTimeField()
     valid_from = models.DateField()
