@@ -34,9 +34,9 @@ azure-core-tracing-opentelemetry==1.0.0b12 \
     --hash=sha256:38fd42709f1cc4bbc4f2797008b1c30a6a01617e49910c05daa3a0d0c65053ac \
     --hash=sha256:bb454142440bae11fd9d68c7c1d67ae38a1756ce808c5e4d736730a7b4b04144
     # via azure-monitor-opentelemetry
-azure-identity==1.25.2 \
-    --hash=sha256:030dbaa720266c796221c6cdbd1999b408c079032c919fef725fcc348a540fe9 \
-    --hash=sha256:1b40060553d01a72ba0d708b9a46d0f61f56312e215d8896d836653ffdc6753d
+azure-identity==1.25.3 \
+    --hash=sha256:ab23c0d63015f50b630ef6c6cf395e7262f439ce06e5d07a64e874c724f8d9e6 \
+    --hash=sha256:f4d0b956a8146f30333e071374171f3cfa7bdb8073adb8c3814b65567aa7447c
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
@@ -396,9 +396,9 @@ cryptography==46.0.5 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==2.0.0 \
-    --hash=sha256:3d6fda4d10bd221dcca3c41ba7f6d85fc892f828923be64c0ebc39ed02b88053 \
-    --hash=sha256:ad945911db5fe5172b3886758724b70cdcb1f38023aab30c38d41f119709ee80
+datapunt-authorization-django==2.0.2 \
+    --hash=sha256:52edd8fa490f34d32e1479b53026583d7050f1914148753df26f199bc5fe711f \
+    --hash=sha256:e1e4480bebf9e9fc321c1581292648131e4743e75eb6f79e59fbf0c30a942a4c
     # via -r requirements.in
 deprecated==1.2.18 \
     --hash=sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d \
@@ -420,9 +420,9 @@ django-cors-headers==4.9.0 \
     --hash=sha256:15c7f20727f90044dcee2216a9fd7303741a864865f0c3657e28b7056f61b449 \
     --hash=sha256:fe5d7cb59fdc2c8c646ce84b727ac2bca8912a247e6e68e1fb507372178e59e8
     # via -r requirements.in
-django-environ==0.12.1 \
-    --hash=sha256:064ba2d5082f833e6d7fe4def4928bde1eedc0248a417575da7db147aeec1c20 \
-    --hash=sha256:22859c6e905ab7637fa3348d1787543bb4492f38d761104a3ce0519b7b752845
+django-environ==0.13.0 \
+    --hash=sha256:37799d14cd78222c6fd8298e48bfe17965ff8e586091ad66a463e52e0e7b799e \
+    --hash=sha256:6c401e4c219442c2c4588c2116d5292b5484a6f69163ed09cd41f3943bfb645f
     # via -r requirements.in
 django-healthchecks==1.5.0 \
     --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
@@ -475,9 +475,9 @@ jwcrypto==1.5.6 \
     --hash=sha256:150d2b0ebbdb8f40b77f543fb44ffd2baeff48788be71f67f03566692fd55789 \
     --hash=sha256:771a87762a0c081ae6166958a954f80848820b2ab066937dc8b8379d65b1b039
     # via datapunt-authorization-django
-msal==1.32.3 \
-    --hash=sha256:5eea038689c78a5a70ca8ecbe1245458b55a857bd096efb6989c69ba15985d35 \
-    --hash=sha256:b2798db57760b1961b142f027ffb7c8169536bf77316e99a0df5c4aaebb11569
+msal==1.35.1 \
+    --hash=sha256:70cac18ab80a053bff86219ba64cfe3da1f307c74b009e2da57ef040eb1b5656 \
+    --hash=sha256:8f4e82f34b10c19e326ec69f44dc6b30171f2f7098f3720ea8a9f0c11832caa3
     # via
     #   azure-identity
     #   msal-extensions
@@ -925,9 +925,9 @@ uwsgi-readiness-check==0.2.0 \
 uwsgitop==0.12 \
     --hash=sha256:4f9330951f0fb9633226de36cf0c28c04dcf323efab608834aa81f638b6019b2
     # via -r requirements.in
-whitenoise==6.11.0 \
-    --hash=sha256:0f5bfce6061ae6611cd9396a8231e088722e4fc67bc13a111be74c738d99375f \
-    --hash=sha256:b2aeb45950597236f53b5342b3121c5de69c8da0109362aee506ce88e022d258
+whitenoise==6.12.0 \
+    --hash=sha256:f723ebb76a112e98816ff80fcea0a6c9b8ecde835f8ddda25df7a30a3c2db6ad \
+    --hash=sha256:fc5e8c572e33ebf24795b47b6a7da8da3c00cff2349f5b04c02f28d0cc5a3cc2
     # via -r requirements.in
 wrapt==1.17.2 \
     --hash=sha256:08e7ce672e35efa54c5024936e559469436f8b8096253404faeb54d2a878416f \
