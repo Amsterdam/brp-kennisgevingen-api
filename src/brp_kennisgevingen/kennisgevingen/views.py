@@ -62,8 +62,6 @@ def _extract_patterns(patterns, prefix, match):
 
 @method_decorator(never_cache, name="dispatch")
 class BaseAPIView(APIView):
-    needed_scopes: set = {"benk-brp-volgindicaties-api"}
-
     authentication_classes = [authentication.JWTAuthentication]
 
     def get_permissions(self):
@@ -100,6 +98,7 @@ class SubscriptionListAPIView(SubscriptionAppIDFilterMixin, ListAPIView, BaseAPI
     List all active subscriptions for an application user.
     """
 
+    needed_scopes: set = {"benk-brp-volgindicaties-api"}
     serializer_class = SubscriptionSerializer
 
     def get(self, request, *args, **kwargs):
@@ -111,6 +110,7 @@ class SubscriptionListAPIView(SubscriptionAppIDFilterMixin, ListAPIView, BaseAPI
     put=schema.put_subscription_schema,
 )
 class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, BaseAPIView):
+    needed_scopes: set = {"benk-brp-volgindicaties-api"}
     http_method_names: list[str] = ["get", "put"]
     lookup_field: str = "bsn"
 
@@ -303,6 +303,7 @@ class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     Request a list of `burgerservicenummers` of persons with updated data.
     """
 
+    needed_scopes: set = {"benk-brp-wijzigingen-api"}
     queryset = Subscription.objects.active()
     input_serializer = UpdatesInputSerializer
 
@@ -317,6 +318,7 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
     Request a list of `burgerservicenummers` of new residents.
     """
 
+    needed_scopes: set = {"benk-brp-nieuwe-ingezetenen-api"}
     queryset = NewResident.objects.all()
     input_serializer = NewResidentsInputSerializer
 
