@@ -409,16 +409,19 @@ class TestSubscriptionsView:
 class TestUpdateViews:
 
     @pytest.mark.parametrize(
-        "url",
-        ["/kennisgevingen/v1/wijzigingen", "/kennisgevingen/v1/nieuwe-ingezetenen"],
+        "url,scope",
+        [
+            ("/kennisgevingen/v1/wijzigingen", "benk-brp-wijzigingen-api"),
+            ("/kennisgevingen/v1/nieuwe-ingezetenen", "benk-brp-nieuwe-ingezetenen-api"),
+        ],
     )
     @pytest.mark.django_db
-    def test_hal_json_response(self, api_client, url, subscriptions, new_residents):
+    def test_hal_json_response(self, api_client, url, scope, subscriptions, new_residents):
         start_date = timezone.now().date() - timedelta(days=15)
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                scope,
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -434,7 +437,7 @@ class TestUpdateViews:
         url = reverse("updates-list")
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -464,7 +467,7 @@ class TestUpdateViews:
         query_params = {"vanaf": today}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -487,7 +490,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -508,7 +511,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -535,7 +538,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -562,7 +565,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-wijzigingen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -589,7 +592,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-nieuwe-ingezetenen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -604,7 +607,7 @@ class TestUpdateViews:
         query_params = {"vanaf": start_date}
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-nieuwe-ingezetenen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -626,7 +629,7 @@ class TestUpdateViews:
         }
         token = build_jwt_token(
             [
-                "benk-brp-volgindicaties-api",
+                "benk-brp-nieuwe-ingezetenen-api",
             ]
         )
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
