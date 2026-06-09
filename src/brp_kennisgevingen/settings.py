@@ -357,7 +357,11 @@ keer wijzigingen waren gevraagd. Voor elk burgerservicenummer in de response
 SPECTACULAR_SETTINGS = {
     "TITLE": "BRP Kennisgevingen API",
     "DESCRIPTION": SPECTACULAR_DESCRIPTION,
-    "CONTACT": {"email": "datapunt@amsterdam.nl"},
+    "CONTACT": {
+        "email": "datapunt@amsterdam.nl",
+        "name": "Datapunt Amsterdam",
+        "url": "https://www.amsterdam.nl/",
+    },
     "VERSION": "1.0.0",
     "LICENSE": {
         "name": "European Union Public License, version 1.2 (EUPL-1.2)",
@@ -365,12 +369,35 @@ SPECTACULAR_SETTINGS = {
     },
     "SCHEMA_PATH_PREFIX": "/kennisgevingen/v1",
     "SCHEMA_PATH_PREFIX_TRIM": True,
+    "SERVERS": [
+        {
+            "url": "https://api.brp.amsterdam.nl/kennisgevingen/v1",
+            "description": "Productieomgeving",
+        },
+        {
+            "url": "https://acc.api.brp.amsterdam.nl/kennisgevingen/v1",
+            "description": "Acceptatieomgeving",
+        },
+        {
+            "url": "https://brp.data-t.azure.amsterdam.nl/kennisgevingen/v1",
+            "description": "Testomgeving",
+        },
+        {
+            "url": "https://brp.data-o.azure.amsterdam.nl/kennisgevingen/v1",
+            "description": "Ontwikkelomgeving",
+        },
+    ],
     "AUTHENTICATION_WHITELIST": None,
     "PREPROCESSING_HOOKS": [
         "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
     ],
+    "POSTPROCESSING_HOOKS": [
+        "brp_kennisgevingen.openapi.postprocessors.postprocessing_add_openapi_cors_header",
+    ],
     "TAGS": [
+        {"name": "bsn-wijzigingen"},
         {"name": "Beheren volgindicaties"},
+        {"name": "openapi.json"},
         {"name": "Raadplegen wijzigingen"},
     ],
 }
