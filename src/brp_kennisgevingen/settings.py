@@ -391,6 +391,9 @@ SPECTACULAR_SETTINGS = {
     "PREPROCESSING_HOOKS": [
         "brp_kennisgevingen.openapi.preprocessors.preprocessing_filter_spec",
     ],
+    "POSTPROCESSING_HOOKS": [
+        "brp_kennisgevingen.openapi.postprocessors.postprocessing_add_openapi_cors_header",
+    ],
     "TAGS": [
         {"name": "bsn-wijzigingen"},
         {"name": "Beheren volgindicaties"},
