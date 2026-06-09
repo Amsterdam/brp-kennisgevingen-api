@@ -397,6 +397,7 @@ SPECTACULAR_SETTINGS = {
     "TAGS": [
         {"name": "bsn-wijzigingen"},
         {"name": "Beheren volgindicaties"},
+        {"name": "openapi.json"},
         {"name": "Raadplegen wijzigingen"},
     ],
 }
