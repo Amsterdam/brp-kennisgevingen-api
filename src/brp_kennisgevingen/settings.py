@@ -298,7 +298,7 @@ if CLOUD_ENV.startswith("azure"):
         }
         for logger_name, logger_details in LOGGING["loggers"].items():
             if "audit_console" in logger_details["handlers"]:
-                LOGGING["loggers"][logger_name]["handlers"] = ["audit_console", "console"]
+                LOGGING["loggers"][logger_name]["handlers"] = ["audit_console"]
         print("Audit logging has been enabled")
 
 
