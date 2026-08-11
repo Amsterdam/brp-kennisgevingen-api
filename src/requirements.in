@@ -3,7 +3,7 @@ django-environ == 0.14.0
 django-cors-headers == 4.9.0
 django-healthchecks == 1.5.0
 datapunt-authorization-django == 2.1.1
-djangorestframework == 3.17.2
+djangorestframework == 3.18.0
 drf-spectacular == 0.30.0
 psycopg2==2.9.12
 python-json-logger==4.1.0
@@ -19,7 +19,7 @@ uwsgi-readiness-check == 0.2.0
 
 # Testing
 pytest == 9.1.1
-pytest-django == 4.12.0
+pytest-django == 4.13.0
 pytest-cov == 7.1.0
 python-owasp-zap-v2.4 == 0.1.0
 requests-mock == 1.12.1
