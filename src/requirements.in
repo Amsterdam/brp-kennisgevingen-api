@@ -19,7 +19,7 @@ uwsgi-readiness-check == 0.2.0
 
 # Testing
 pytest == 9.1.1
-pytest-django == 4.13.0
+pytest-django == 4.14.0
 pytest-cov == 7.1.0
 python-owasp-zap-v2.4 == 0.1.0
 requests-mock == 1.12.1
