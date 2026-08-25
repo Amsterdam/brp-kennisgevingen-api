@@ -397,9 +397,9 @@ cryptography==50.0.0 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==2.1.1 \
-    --hash=sha256:bbff71142369fa9b001335453b26c438ab287f092c740d698163c27aa6bf9f2d \
-    --hash=sha256:e41a29befd821a04bd18f85ae5037663eb53f69e92e78f29aa889d4377b167ba
+datapunt-authorization-django==2.2.0 \
+    --hash=sha256:28eedf126a92d6dd57f8633baaa3a08c5f8de8a10dc1fc24878a2ec4a44ee75b \
+    --hash=sha256:df18726514f6fc17005c303c76152e017e1812595ec0a937c9145ee99080fe9f
     # via -r requirements.in
 django==5.2.17 \
     --hash=sha256:9d4d93be539a18ab80d058eb515900e10951e04c537c5a6b394fc49528d3251f \
@@ -677,9 +677,9 @@ python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
     # via -r requirements.in
-python-json-logger==4.1.0 \
-    --hash=sha256:132994765cf75bf44554be9aa49b06ef2345d23661a96720262716438141b6b2 \
-    --hash=sha256:b396b9e3ed782b09ff9d6e4f1683d46c83ad0d35d2e407c09a9ebbf038f88195
+python-json-logger==4.2.0 \
+    --hash=sha256:158a52126fcd6869e09574d2b66272666f3dc8f468c62637ef9a1fa883719cb9 \
+    --hash=sha256:e371ebe22ec01e289850102091a2b1f6fc9e655c7f1f5f29073936756c290afa
     # via -r requirements.in
 python-owasp-zap-v2-4==0.1.0 \
     --hash=sha256:2af4252320b3b77a38712081422688e676e038306cf1f2792feed811235afa8b \
