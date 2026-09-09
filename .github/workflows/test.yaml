@@ -13,11 +13,19 @@ on:
     - master
 
 jobs:
-  docker:
+  tests:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    # Run against multiple Postgres versions, while we migrate the db.
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres-version:
+          - 14
+          - 17
     env:
       INITIALIZE_DB: false
+      POSTGRES_VERSION: ${{ matrix.postgres-version }}
 
     steps:
     - name: Checkout
