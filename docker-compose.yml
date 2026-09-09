@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:15
+    image: postgres:${POSTGRES_VERSION:-17}
     restart: always
     user: postgres
     shm_size: 128mb
