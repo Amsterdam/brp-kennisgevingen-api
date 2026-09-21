@@ -241,7 +241,9 @@ if CLOUD_ENV.startswith("azure"):
 
     # Microsoft recommended abbreviation for Application Insights is `APPI`
     AZURE_APPI_CONNECTION_STRING = env.str("AZURE_APPI_CONNECTION_STRING")
-    AZURE_APPI_AUDIT_CONNECTION_STRING = env.str("AZURE_APPI_AUDIT_CONNECTION_STRING", None)
+    AZURE_DATA_COLLECTION_ENDPOINT = env.str("AZURE_DATA_COLLECTION_ENDPOINT", None)
+    AZURE_DATA_COLLECTION_RULE_ID = env.str("AZURE_DATA_COLLECTION_RULE_ID", None)
+    AZURE_DATA_COLLECTION_STREAM_NAME = env.str("AZURE_DATA_COLLECTION_STREAM_NAME", None)
 
     # Configure OpenTelemetry to use Azure Monitor with the specified connection string
     if AZURE_APPI_CONNECTION_STRING is not None:
@@ -276,25 +278,11 @@ if CLOUD_ENV.startswith("azure"):
         # Psycopg2Instrumentor().instrument(enable_commenter=True, commenter_options={})
         # print("Psycopg instrumentor enabled")
 
-    if AZURE_APPI_AUDIT_CONNECTION_STRING is not None:
-        # Configure audit logging to an extra log
-        from azure.monitor.opentelemetry.exporter import AzureMonitorLogExporter
-        from opentelemetry.sdk._logs import LoggerProvider
-        from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-
-        audit_logger_provider = LoggerProvider()
-        audit_logger_provider.add_log_record_processor(
-            BatchLogRecordProcessor(
-                AzureMonitorLogExporter(connection_string=AZURE_APPI_AUDIT_CONNECTION_STRING)
-            )
-        )
-
-        # Attach LoggingHandler to namespaced logger
-        # same as: handler = LoggingHandler(logger_provider=audit_logger_provider)
+    if AZURE_DATA_COLLECTION_ENDPOINT is not None:
+        # Configure audit logging to use our custom synchronous logger
         LOGGING["handlers"]["audit_console"] = {
             "level": "DEBUG",
-            "class": "opentelemetry.sdk._logs.LoggingHandler",
-            "logger_provider": audit_logger_provider,
+            "class": "brp_amsterdam_api.bevragingen.loghandler.BRPAuditLogHandler",
             "formatter": "audit_json",
         }
         for logger_name, logger_details in LOGGING["loggers"].items():
