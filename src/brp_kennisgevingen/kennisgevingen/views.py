@@ -1,15 +1,18 @@
 import logging
+import time
 from fnmatch import fnmatch
 
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
-from django.urls import get_resolver
+from django.urls import get_resolver, reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from drf_spectacular.utils import extend_schema_view
 from rest_framework import status
+from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -64,6 +67,45 @@ def _extract_patterns(patterns, prefix, match):
 class BaseAPIView(APIView):
     authentication_classes = [authentication.JWTAuthentication]
 
+    #: An random short-name for the service name in logging statements
+    service_log_id: str = None
+
+    #: The based scopes needed for all requests.
+    needed_scopes: set = None
+
+    def initial(self, request, *args, **kwargs):
+        """DRF-level initialization for all request types."""
+        self._base_url = reverse(request.resolver_match.view_name)
+        self.start_time = time.perf_counter_ns()
+        self.start_date = now()
+
+        # Perform authorization, permission checks and throttles.
+        super().initial(request, *args, **kwargs)
+
+        # Options requests do not have a token in the header, so we'll return early
+        if request.method == "OPTIONS":
+            return
+
+        # Token is validated, extract token scopes that are set by the middleware
+        self.user_scopes = set(request.get_token_scopes)
+        self.upn = request.get_token_claims.get("email", request.get_token_subject)
+        self.appid = request.get_token_claims.get("appid")
+
+        try:
+            # request.data is only available in initial(), not in setup()
+            self.default_log_fields = {
+                "service": self.service_log_id,
+                "queryType": request.data.get("type", None),
+                "upn": self.upn,
+                "granted": sorted(self.user_scopes),
+            }
+            if self.appid:
+                self.default_log_fields["appid"] = self.appid
+        except KeyError as e:
+            raise PermissionDenied(
+                f"A required header is missing: {e.args[0]}", code="missingHeaders"
+            ) from None
+
     def get_permissions(self):
         """Collect the DRF permission checks.
         DRF checks these in the initial() method, and will block view access
@@ -73,6 +115,78 @@ class BaseAPIView(APIView):
             raise ImproperlyConfigured("needed_scopes is not set")
 
         return super().get_permissions() + [permissions.IsUserScope(self.needed_scopes)]
+
+    def log_access_denied(self, request, err: permissions.AccessDenied) -> None:
+        """Perform the audit logging for the denied request."""
+        missing = sorted(err.needed_scopes - self.user_scopes)
+        audit_log.info(
+            "Denied access to '%(service)s.%(queryType)s'"
+            " for %(field)s=%(values)s, missing %(missing)s",
+            {
+                "service": self.service_log_id,
+                "field": err.field_name,
+                "values": ",".join(err.denied_values),
+                "missing": ",".join(missing),
+            },
+            extra={
+                **self.default_log_fields,
+                "field": err.field_name,
+                "values": err.denied_values,
+                "needed": sorted(err.needed_scopes),
+                "missing": missing,
+                "requestStarted": self.start_date,
+                "requestProcessed": now(),
+                "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
+            },
+        )
+
+    def log_access_granted(
+        self,
+        request,
+        final_response,
+        needed_scopes: set[str],
+        exception: OSError | APIException | None = None,
+        extra: dict | None = None,
+    ) -> None:
+        """Perform the audit logging for the request/response.
+
+        This is a very basic global logging.
+        Per service type, it may need more refinement.
+        """
+        extra = extra or {}
+
+        extra.update(
+            {
+                **self.default_log_fields,
+                "needed": sorted(needed_scopes),
+                "request": request.data,
+                "response": final_response,
+                "requestStarted": self.start_date,
+                "requestProcessed": now(),
+                "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
+            }
+        )
+
+        if exception is None:
+            msg = (
+                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
+                " (full request/response in detail)"
+            )
+        else:
+            msg = (
+                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
+                ", but error returned (full request/response in detail)"
+            )
+            extra["exception"] = str(exception)
+
+        audit_log.info(
+            msg,
+            {
+                "service": self.service_log_id,
+                "upn": self.upn,
+            },
+            extra=extra,
+        )
 
 
 class SubscriptionAppIDFilterMixin:
