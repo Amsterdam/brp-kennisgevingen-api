@@ -11,6 +11,7 @@ _USE_SECRET_STORE = Path("/mnt/secrets-store").exists()
 
 SRC_DIR = Path(__file__).parents[1]
 
+NAMESPACE = env.str("NAMESPACE", "default").lower()
 CLOUD_ENV = env.str("CLOUD_ENV", "default").lower()
 DEBUG = env.bool("DJANGO_DEBUG", default=(CLOUD_ENV == "default"))
 
