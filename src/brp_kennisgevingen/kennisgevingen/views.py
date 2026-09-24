@@ -3,6 +3,7 @@ import time
 from fnmatch import fnmatch
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.urls import get_resolver
@@ -95,6 +96,7 @@ class BaseAPIView(APIView):
             "service": self.service_log_id,
             "upn": self.upn,
             "granted": sorted(self.user_scopes),
+            "environment": settings.NAMESPACE,
         }
         if self.appid:
             self.default_log_fields["appid"] = self.appid

@@ -51,3 +51,5 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+NAMESPACE = "brp-kennisgevingen-local"

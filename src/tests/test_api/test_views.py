@@ -34,6 +34,7 @@ def assert_latest_access_granted(
     assert audit_log_message.upn == "test@example.com"
     assert audit_log_message.granted == [scope]
     assert audit_log_message.appid == "application_id"
+    assert audit_log_message.environment == "brp-kennisgevingen-local"
     assert audit_log_message.needed == [scope]
     assert audit_log_message.burgerservicenummers == burgerservicenummers
     if response is not None:
