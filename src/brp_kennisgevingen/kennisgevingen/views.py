@@ -5,14 +5,14 @@ from fnmatch import fnmatch
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
-from django.urls import get_resolver, reverse
+from django.urls import get_resolver
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from drf_spectacular.utils import extend_schema_view
 from rest_framework import status
-from rest_framework.exceptions import APIException, PermissionDenied
+from rest_framework.exceptions import APIException
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -75,7 +75,6 @@ class BaseAPIView(APIView):
 
     def initial(self, request, *args, **kwargs):
         """DRF-level initialization for all request types."""
-        self._base_url = reverse(request.resolver_match.view_name)
         self.start_time = time.perf_counter_ns()
         self.start_date = now()
 
@@ -91,20 +90,40 @@ class BaseAPIView(APIView):
         self.upn = request.get_token_claims.get("email", request.get_token_subject)
         self.appid = request.get_token_claims.get("appid")
 
-        try:
-            # request.data is only available in initial(), not in setup()
-            self.default_log_fields = {
-                "service": self.service_log_id,
-                "queryType": request.data.get("type", None),
-                "upn": self.upn,
-                "granted": sorted(self.user_scopes),
-            }
-            if self.appid:
-                self.default_log_fields["appid"] = self.appid
-        except KeyError as e:
-            raise PermissionDenied(
-                f"A required header is missing: {e.args[0]}", code="missingHeaders"
-            ) from None
+        # request.data is only available in initial(), not in setup()
+        self.default_log_fields = {
+            "service": self.service_log_id,
+            "upn": self.upn,
+            "granted": sorted(self.user_scopes),
+        }
+        if self.appid:
+            self.default_log_fields["appid"] = self.appid
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        """DRF-level finalization for all request types."""
+
+        if response.status_code not in [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED]:
+            burgerservicenummers = self._extract_burgerservicenummers(response.data)
+            self.log_access_granted(
+                request,
+                response.data,
+                self.needed_scopes,
+                extra={"burgerservicenummers": burgerservicenummers},
+            )
+
+        return super().finalize_response(request, response)
+
+    def _extract_burgerservicenummers(self, response_data) -> list[str]:
+        """Extract the list of burgerservicenummers from the response data."""
+        if isinstance(response_data, list):
+            return [
+                x.get("burgerservicenummer")
+                for x in response_data
+                if isinstance(x, dict) and "burgerservicenummer" in x
+            ]
+        elif isinstance(response_data, dict) and "burgerservicenummer" in response_data:
+            return [response_data["burgerservicenummer"]]
+        return []
 
     def get_permissions(self):
         """Collect the DRF permission checks.
@@ -116,23 +135,17 @@ class BaseAPIView(APIView):
 
         return super().get_permissions() + [permissions.IsUserScope(self.needed_scopes)]
 
-    def log_access_denied(self, request, err: permissions.AccessDenied) -> None:
+    def log_access_denied(self) -> None:
         """Perform the audit logging for the denied request."""
-        missing = sorted(err.needed_scopes - self.user_scopes)
+        missing = sorted(self.needed_scopes - self.user_scopes)
         audit_log.info(
-            "Denied access to '%(service)s.%(queryType)s'"
-            " for %(field)s=%(values)s, missing %(missing)s",
+            "Denied access to '%(service)s' missing %(missing)s",
             {
                 "service": self.service_log_id,
-                "field": err.field_name,
-                "values": ",".join(err.denied_values),
                 "missing": ",".join(missing),
             },
             extra={
                 **self.default_log_fields,
-                "field": err.field_name,
-                "values": err.denied_values,
-                "needed": sorted(err.needed_scopes),
                 "missing": missing,
                 "requestStarted": self.start_date,
                 "requestProcessed": now(),
@@ -169,12 +182,12 @@ class BaseAPIView(APIView):
 
         if exception is None:
             msg = (
-                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
+                "Access granted for '%(service)s' to '%(upn)s'"
                 " (full request/response in detail)"
             )
         else:
             msg = (
-                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
+                "Access granted for '%(service)s' to '%(upn)s'"
                 ", but error returned (full request/response in detail)"
             )
             extra["exception"] = str(exception)
@@ -214,9 +227,7 @@ class SubscriptionListAPIView(SubscriptionAppIDFilterMixin, ListAPIView, BaseAPI
 
     needed_scopes: set = {"benk-brp-volgindicaties-api"}
     serializer_class = SubscriptionSerializer
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    service_log_id: str = "volgindicaties-list"
 
 
 @extend_schema_view(
@@ -227,6 +238,7 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
     needed_scopes: set = {"benk-brp-volgindicaties-api"}
     http_method_names: list[str] = ["get", "put"]
     lookup_field: str = "bsn"
+    service_log_id: str = "volgindicaties"
 
     def get_object(self, for_update: bool = False) -> Subscription | None:
         bsn = self.kwargs[self.lookup_field]
@@ -259,26 +271,6 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
             return UpdateSubscriptionSerializer
         return SubscriptionSerializer
 
-    def log_access(self, request, msg: str, bsn: str):
-        user_scopes = set(request.get_token_scopes)
-        user_id = request.get_token_claims.get("email", request.get_token_subject)
-        extra = {
-            "user": user_id,
-            "granted": sorted(user_scopes),
-            "needed": sorted(self.needed_scopes),
-            "bsn": bsn,
-            "request": request.data,
-        }
-
-        audit_log.info(
-            msg,
-            {
-                "user": user_id,
-                "bsn": bsn,
-            },
-            extra=extra,
-        )
-
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
@@ -298,11 +290,6 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
 
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            msg = (
-                "Access denied for 'update subscription' to '%(user)s' on '%(bsn)s'"
-                " (full request/response in detail)"
-            )
-            self.log_access(request=request, msg=msg, bsn=bsn)
             raise_serializer_validation_error(serializer)
 
         # Get the optional subscription end date
@@ -310,11 +297,6 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
 
         if not instance:
             if end_date and end_date < timezone.now().date():
-                msg = (
-                    "Access denied for 'update subscription' to '%(user)s' on '%(bsn)s'"
-                    " (full request/response in detail)"
-                )
-                self.log_access(request=request, msg=msg, bsn=bsn)
                 raise ProblemJsonException(
                     title="Geen correcte waarde opgegeven.",
                     detail="The request could not be understood by the server due to malformed "
@@ -330,12 +312,6 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
                     ],
                 )
 
-            msg = (
-                "Access granted for 'new subscription' to '%(user)s' on '%(bsn)s'"
-                " (full request/response in detail)"
-            )
-            self.log_access(request=request, msg=msg, bsn=bsn)
-
             instance = Subscription.objects.create(
                 application_id=self.application_id,
                 bsn=bsn,
@@ -347,11 +323,6 @@ class SubscriptionsAPIView(SubscriptionAppIDFilterMixin, RetrieveUpdateAPIView, 
         else:
             instance.set_end_date(end_date)
 
-            msg = (
-                "Access granted for 'update subscription' to '%(user)s' on '%(bsn)s'"
-                " (full request/response in detail)"
-            )
-            self.log_access(request=request, msg=msg, bsn=bsn)
             serializer = SubscriptionSerializer(instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -403,6 +374,10 @@ class UpdatesAPIBaseView(BaseAPIView):
         )
         return Response(serializer.data)
 
+    def _extract_burgerservicenummers(self, response_data) -> list[str]:
+        """Extract the list of burgerservicenummers from the response data."""
+        return response_data.get("burgerservicenummers", [])
+
     def _validate_input_serializer(self, query_params):
         # Validate URL query parameters
         query_serializer = self.input_serializer(data=query_params)
@@ -420,6 +395,7 @@ class UpdatesAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     needed_scopes: set = {"benk-brp-wijzigingen-api"}
     queryset = Subscription.objects.active()
     input_serializer = UpdatesInputSerializer
+    service_log_id = "wijzigingen"
 
     def get_queryset(self):
         subscriptions = super().get_queryset().values_list("bsn", flat=True).distinct()
@@ -435,6 +411,7 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
     needed_scopes: set = {"benk-brp-nieuwe-ingezetenen-api"}
     queryset = NewResident.objects.all()
     input_serializer = NewResidentsInputSerializer
+    service_log_id = "nieuwe-ingezetenen"
 
     def filter_queryset(self, queryset):
         query_serializer = self._validate_input_serializer(self.request.query_params)
@@ -461,6 +438,7 @@ class BSNChangesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
 
     needed_scopes: set = {"benk-brp-bsn-wijzigingen-api"}
     input_serializer = UpdatesInputSerializer
+    service_log_id = "bsn-wijzigingen"
 
     def get(self, request, *args, **kwargs):
         # Validate URL query parameters
@@ -482,3 +460,16 @@ class BSNChangesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     def get_queryset(self):
         subscriptions = super().get_queryset().values_list("bsn", flat=True).distinct()
         return BSNChange.objects.filter(old_bsn__in=subscriptions)
+
+    def _extract_burgerservicenummers(self, response_data) -> list[str]:
+        """Extract the list of burgerservicenummers from the response data."""
+        burgerservicenummers = []
+        for change in response_data.get("bsnWijzigingen", []):
+            if isinstance(change, dict):
+                old_bsn = change.get("burgerservicenummerOud")
+                new_bsn = change.get("burgerservicenummerNieuw")
+                if old_bsn:
+                    burgerservicenummers.append(old_bsn)
+                if new_bsn:
+                    burgerservicenummers.append(new_bsn)
+        return burgerservicenummers

@@ -7,6 +7,55 @@ from django.utils import timezone
 from brp_kennisgevingen.models import BSNMutation
 from tests.utils import build_jwt_token
 
+AUDIT_LOGGER_NAME = "brp_kennisgevingen.audit"
+
+
+def get_audit_records(caplog):
+    return [record for record in caplog.records if record.name == AUDIT_LOGGER_NAME]
+
+
+def assert_latest_access_granted(
+    caplog,
+    *,
+    service,
+    scope,
+    burgerservicenummers,
+    response=None,
+):
+    audit_records = get_audit_records(caplog)
+    assert audit_records
+
+    audit_log_message = audit_records[-1]
+    assert audit_log_message.message == (
+        f"Access granted for '{service}' to 'test@example.com' "
+        "(full request/response in detail)"
+    )
+    assert audit_log_message.service == service
+    assert audit_log_message.upn == "test@example.com"
+    assert audit_log_message.granted == [scope]
+    assert audit_log_message.appid == "application_id"
+    assert audit_log_message.needed == [scope]
+    assert audit_log_message.burgerservicenummers == burgerservicenummers
+    if response is not None:
+        assert audit_log_message.response == response
+
+
+def assert_latest_access_denied(caplog, *, path, granted_scopes, needed_scopes):
+    audit_records = get_audit_records(caplog)
+    assert audit_records
+
+    audit_log_message = audit_records[-1]
+    missing_scopes = sorted(set(needed_scopes) - set(granted_scopes))
+
+    assert audit_log_message.message == (
+        f"Denied overall access to '{path}', missing {','.join(missing_scopes)}"
+    )
+    assert audit_log_message.path == path
+    assert audit_log_message.granted == sorted(granted_scopes)
+    assert audit_log_message.needed == sorted(needed_scopes)
+    assert audit_log_message.missing == missing_scopes
+    assert audit_log_message.appid == "application_id"
+
 
 class TestBaseView:
     """Prove that the generic view offers the login check logic.
@@ -36,24 +85,27 @@ class TestBaseView:
             "instance": url,
         }
 
-    def test_insufficient_scopes(self, api_client):
+    def test_insufficient_scopes(self, api_client, caplog):
         """Prove that insufficient scopes are handled."""
         url = reverse("subscriptions-list")
-        token = build_jwt_token(
-            [
-                "benk-brp-invalid",
-            ]
-        )
+        granted_scopes = ["benk-brp-invalid"]
+        token = build_jwt_token(granted_scopes)
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 403
         assert response.data == {
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
             "title": "You do not have permission to perform this action.",
             "status": 403,
-            "detail": "",
+            "detail": "Required scopes not given in token.",
             "code": "permissionDenied",
             "instance": "/kennisgevingen/v1/volgindicaties",
         }
+        assert_latest_access_denied(
+            caplog,
+            path="/kennisgevingen/v1/volgindicaties",
+            granted_scopes=granted_scopes,
+            needed_scopes=["benk-brp-volgindicaties-api"],
+        )
 
 
 class TestSubscriptionsView:
@@ -73,7 +125,7 @@ class TestSubscriptionsView:
         assert response.data == []
 
     @pytest.mark.django_db
-    def test_subscriptions_for_application_id(self, api_client, subscriptions):
+    def test_subscriptions_for_application_id(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-list")
 
         token = build_jwt_token(
@@ -90,6 +142,14 @@ class TestSubscriptionsView:
         assert len(response.data) == 3
         for record in response.data:
             assert record["burgerservicenummer"] in ["999990019", "999990093", "999990267"]
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties-list",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019", "999990093", "999990267"],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_subscriptions_ending_today_are_not_returned(self, api_client, subscription_today):
@@ -124,7 +184,7 @@ class TestSubscriptionsView:
         assert len(response.data) == 0
 
     @pytest.mark.django_db
-    def test_subscriptions_detail_exists(self, api_client, subscriptions):
+    def test_subscriptions_detail_exists(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
 
         token = build_jwt_token(
@@ -137,8 +197,16 @@ class TestSubscriptionsView:
         assert response.status_code == 200
         assert response.data["burgerservicenummer"] == "999990019"
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
-    def test_subscriptions_detail_inactive(self, api_client, subscriptions):
+    def test_subscriptions_detail_inactive(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990147"})
 
         token = build_jwt_token(
@@ -158,8 +226,16 @@ class TestSubscriptionsView:
             "instance": "/kennisgevingen/v1/volgindicaties/999990147",
         }
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
-    def test_subscriptions_detail_invalid_bsn(self, api_client, subscriptions):
+    def test_subscriptions_detail_invalid_bsn(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "invalid"})
 
         token = build_jwt_token(
@@ -187,6 +263,14 @@ class TestSubscriptionsView:
             ],
         }
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
     def test_create_new_subscription(self, api_client, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
@@ -208,7 +292,16 @@ class TestSubscriptionsView:
             "einddatum": str(today + timedelta(days=30)),
         }
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
+
         # Expect subscription to exist
+        caplog.clear()
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert response.data == {
@@ -217,14 +310,13 @@ class TestSubscriptionsView:
             "einddatum": str(today + timedelta(days=30)),
         }
 
-        log_messages = caplog.messages
-        for log_message in [
-            (
-                "Access granted for 'new subscription' to 'test@example.com' on '999990019' "
-                "(full request/response in detail)"
-            ),
-        ]:
-            assert log_message in log_messages
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_create_new_subscription_end_date_in_past(self, api_client, caplog):
@@ -258,9 +350,26 @@ class TestSubscriptionsView:
             ],
         }
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
         # Subscription should not exist
+        caplog.clear()
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_create_new_subscription_empty_end_date(self, api_client, caplog):
@@ -286,6 +395,14 @@ class TestSubscriptionsView:
             "einddatum": None,
         }
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
     def test_change_existing_active_subscription(self, api_client, subscriptions, caplog):
         url = reverse("subscriptions-detail", kwargs={"bsn": "999990019"})
@@ -302,18 +419,26 @@ class TestSubscriptionsView:
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
+
         # End date should be set to the new date
+        caplog.clear()
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.data["einddatum"] == str(new_date)
 
-        log_messages = caplog.messages
-        for log_message in [
-            (
-                "Access granted for 'update subscription' to 'test@example.com' on '999990019' "
-                "(full request/response in detail)"
-            ),
-        ]:
-            assert log_message in log_messages
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_remove_existing_active_subscription(self, api_client, subscriptions, caplog):
@@ -332,18 +457,26 @@ class TestSubscriptionsView:
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990019"],
+            response=response.data,
+        )
+
         # The subscription should not be available anymore
+        caplog.clear()
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
 
-        log_messages = caplog.messages
-        for log_message in [
-            (
-                "Access granted for 'update subscription' to 'test@example.com' on '999990019' "
-                "(full request/response in detail)"
-            ),
-        ]:
-            assert log_message in log_messages
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_reactivate_expired_subscription(self, api_client, subscriptions, caplog):
@@ -359,17 +492,43 @@ class TestSubscriptionsView:
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
         # Set the end date to a future date to create a new subscription
         new_date = timezone.now().date() + timedelta(days=30)
         data = {"einddatum": new_date}
 
+        caplog.clear()
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 201
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990147"],
+            response=response.data,
+        )
+
         # The subscription should be available again
+        caplog.clear()
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert response.data["einddatum"] == str(new_date)
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990147"],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_send_multiple_updates(self, api_client, subscriptions, caplog):
@@ -385,25 +544,60 @@ class TestSubscriptionsView:
         response = api_client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 404
 
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
         # Set the end date to a future date to create a new subscription
         new_date = timezone.now().date() + timedelta(days=30)
         data = {"einddatum": new_date}
 
+        caplog.clear()
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 201
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990147"],
+            response=response.data,
+        )
 
         # Remove the subscription by setting a date in the past
         past_date = timezone.now().date() - timedelta(days=30)
         data = {"einddatum": past_date}
 
+        caplog.clear()
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990147"],
+            response=response.data,
+        )
 
         # Set the end date to a future date to re-activate the subscription
         data = {"einddatum": new_date}
 
+        caplog.clear()
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
+
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=["999990147"],
+            response=response.data,
+        )
 
 
 class TestUpdateViews:
@@ -433,7 +627,7 @@ class TestUpdateViews:
         assert all(field in response.data["_links"] for field in ["self", "ingeschrevenPersoon"])
 
     @pytest.mark.django_db
-    def test_missing_query_parameter(self, api_client):
+    def test_missing_query_parameter(self, api_client, caplog):
         url = reverse("updates-list")
         token = build_jwt_token(
             [
@@ -459,6 +653,14 @@ class TestUpdateViews:
                 }
             ],
         }
+
+        assert_latest_access_granted(
+            caplog,
+            service="wijzigingen",
+            scope="benk-brp-wijzigingen-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_no_subscriptions_returns_empty_array(self, api_client):
@@ -505,7 +707,7 @@ class TestUpdateViews:
         }
 
     @pytest.mark.django_db
-    def test_inserted_at_within_search_window(self, api_client, subscriptions):
+    def test_inserted_at_within_search_window(self, api_client, subscriptions, caplog):
         url = reverse("updates-list")
         start_date = timezone.now().date() - timedelta(days=10)
         query_params = {"vanaf": start_date}
@@ -527,9 +729,18 @@ class TestUpdateViews:
         bsn_mutation.inserted_at = timezone_aware_start_date + timedelta(days=3)
         bsn_mutation.save()
 
+        caplog.clear()
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 1
+
+        assert_latest_access_granted(
+            caplog,
+            service="wijzigingen",
+            scope="benk-brp-wijzigingen-api",
+            burgerservicenummers=[subscriptions[0].bsn],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_inserted_at_outside_search_window(self, api_client, subscriptions):
@@ -586,7 +797,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
-    def test_new_resident_in_search_window(self, api_client, new_residents):
+    def test_new_resident_in_search_window(self, api_client, new_residents, caplog):
         url = reverse("new-residents-list")
         start_date = timezone.now().date() - timedelta(days=15)
         query_params = {"vanaf": start_date}
@@ -599,6 +810,14 @@ class TestUpdateViews:
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 1
+
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-ingezetenen",
+            scope="benk-brp-nieuwe-ingezetenen-api",
+            burgerservicenummers=response.data["burgerservicenummers"],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_new_resident_outside_search_window(self, api_client, new_residents):
@@ -616,7 +835,7 @@ class TestUpdateViews:
         assert len(response.data["burgerservicenummers"]) == 0
 
     @pytest.mark.django_db
-    def test_new_resident_with_max_age(self, api_client, new_residents):
+    def test_new_resident_with_max_age(self, api_client, new_residents, caplog):
         """
         One new resident within the search window has an age of 10. We should
         be able to filter this record bases on the maxLeeftijd parameter
@@ -637,30 +856,53 @@ class TestUpdateViews:
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 1
 
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-ingezetenen",
+            scope="benk-brp-nieuwe-ingezetenen-api",
+            burgerservicenummers=response.data["burgerservicenummers"],
+            response=response.data,
+        )
+
         query_params["maxLeeftijd"] = 9
+        caplog.clear()
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 200
         assert len(response.data["burgerservicenummers"]) == 0
 
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-ingezetenen",
+            scope="benk-brp-nieuwe-ingezetenen-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
-    def test_bsn_changes_incorrect_scope(self, api_client, subscriptions, bsn_changes):
+    def test_bsn_changes_incorrect_scope(self, api_client, subscriptions, bsn_changes, caplog):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
         query_params = {
             "vanaf": start_date,
         }
-        token = build_jwt_token(
-            [
-                "benk-brp-volgindicaties-api",
-            ]
-        )
+        granted_scopes = ["benk-brp-volgindicaties-api"]
+        token = build_jwt_token(granted_scopes)
         response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
 
         assert response.status_code == 403
 
+        assert_latest_access_denied(
+            caplog,
+            path="/kennisgevingen/v1/bsn-wijzigingen",
+            granted_scopes=granted_scopes,
+            needed_scopes=["benk-brp-bsn-wijzigingen-api"],
+        )
+
     @pytest.mark.django_db
-    def test_bsn_changes_list_view_in_search_window(self, api_client, subscriptions, bsn_changes):
+    def test_bsn_changes_list_view_in_search_window(
+        self, api_client, subscriptions, bsn_changes, caplog
+    ):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
         query_params = {
@@ -678,6 +920,20 @@ class TestUpdateViews:
         assert not {
             inst["burgerservicenummerOud"] for inst in response.data["bsnWijzigingen"]
         }.intersection({"999990155"})
+
+        assert_latest_access_granted(
+            caplog,
+            service="bsn-wijzigingen",
+            scope="benk-brp-bsn-wijzigingen-api",
+            burgerservicenummers=[
+                "999990019",
+                "999990020",
+                "999990093",
+                "999990094",
+                "999990267",
+            ],
+            response=response.data,
+        )
 
     @pytest.mark.django_db
     def test_bsn_changes_list_view_outside_search_window(
@@ -702,7 +958,9 @@ class TestUpdateViews:
         }.intersection({"999990155", "999990093"})
 
     @pytest.mark.django_db
-    def test_bsn_changes_list_view_empty_new_bsn(self, api_client, subscriptions, bsn_changes):
+    def test_bsn_changes_list_view_empty_new_bsn(
+        self, api_client, subscriptions, bsn_changes, caplog
+    ):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=5)
         query_params = {
@@ -720,8 +978,16 @@ class TestUpdateViews:
         assert response.data["bsnWijzigingen"][0]["burgerservicenummerOud"] == "999990267"
         assert response.data["bsnWijzigingen"][0]["burgerservicenummerNieuw"] == ""
 
+        assert_latest_access_granted(
+            caplog,
+            service="bsn-wijzigingen",
+            scope="benk-brp-bsn-wijzigingen-api",
+            burgerservicenummers=["999990267"],
+            response=response.data,
+        )
+
     @pytest.mark.django_db
-    def test_bsn_changes_list_missing_query_parameter(self, api_client):
+    def test_bsn_changes_list_missing_query_parameter(self, api_client, caplog):
         url = reverse("bsn-changes-list")
         token = build_jwt_token(
             [
@@ -747,3 +1013,11 @@ class TestUpdateViews:
                 }
             ],
         }
+
+        assert_latest_access_granted(
+            caplog,
+            service="bsn-wijzigingen",
+            scope="benk-brp-bsn-wijzigingen-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
