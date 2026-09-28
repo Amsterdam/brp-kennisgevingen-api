@@ -105,7 +105,7 @@ class BaseAPIView(APIView):
         """DRF-level finalization for all request types."""
 
         if response.status_code not in [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED]:
-            burgerservicenummers = self._extract_burgerservicenummers(response.data)
+            burgerservicenummers = self._extract_burgerservicenummers(request, response.data)
             self.log_access_granted(
                 request,
                 response.data,
@@ -115,17 +115,23 @@ class BaseAPIView(APIView):
 
         return super().finalize_response(request, response)
 
-    def _extract_burgerservicenummers(self, response_data) -> list[str]:
-        """Extract the list of burgerservicenummers from the response data."""
+    def _extract_burgerservicenummers(self, request, response_data) -> list[str]:
+        """Extract the list of burgerservicenummers from the request url and response data."""
+        burgerservicenummers = set()
+        if bsn := self.kwargs.get("bsn"):
+            burgerservicenummers.add(bsn)
+
         if isinstance(response_data, list):
-            return [
-                x.get("burgerservicenummer")
-                for x in response_data
-                if isinstance(x, dict) and "burgerservicenummer" in x
-            ]
+            burgerservicenummers.update(
+                [
+                    str(x.get("burgerservicenummer"))
+                    for x in response_data
+                    if isinstance(x, dict) and "burgerservicenummer" in x
+                ]
+            )
         elif isinstance(response_data, dict) and "burgerservicenummer" in response_data:
-            return [response_data["burgerservicenummer"]]
-        return []
+            burgerservicenummers.add(response_data["burgerservicenummer"])
+        return list(burgerservicenummers)
 
     def get_permissions(self):
         """Collect the DRF permission checks.
@@ -169,12 +175,12 @@ class BaseAPIView(APIView):
         Per service type, it may need more refinement.
         """
         extra = extra or {}
-
+        requestData = request.GET | request.data
         extra.update(
             {
                 **self.default_log_fields,
                 "needed": sorted(needed_scopes),
-                "request": request.data,
+                "requestData": requestData,
                 "response": final_response,
                 "requestStarted": self.start_date,
                 "requestProcessed": now(),
@@ -376,7 +382,7 @@ class UpdatesAPIBaseView(BaseAPIView):
         )
         return Response(serializer.data)
 
-    def _extract_burgerservicenummers(self, response_data) -> list[str]:
+    def _extract_burgerservicenummers(self, request, response_data) -> list[str]:
         """Extract the list of burgerservicenummers from the response data."""
         return response_data.get("burgerservicenummers", [])
 
@@ -463,7 +469,7 @@ class BSNChangesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
         subscriptions = super().get_queryset().values_list("bsn", flat=True).distinct()
         return BSNChange.objects.filter(old_bsn__in=subscriptions)
 
-    def _extract_burgerservicenummers(self, response_data) -> list[str]:
+    def _extract_burgerservicenummers(self, request, response_data) -> list[str]:
         """Extract the list of burgerservicenummers from the response data."""
         burgerservicenummers = []
         for change in response_data.get("bsnWijzigingen", []):
