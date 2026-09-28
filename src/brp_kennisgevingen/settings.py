@@ -283,7 +283,7 @@ if CLOUD_ENV.startswith("azure"):
         # Configure audit logging to use our custom synchronous logger
         LOGGING["handlers"]["audit_console"] = {
             "level": "DEBUG",
-            "class": "brp_amsterdam_api.bevragingen.loghandler.BRPAuditLogHandler",
+            "class": "brp_kennisgevingen.kennisgevingen.loghandler.BRPAuditLogHandler",
             "formatter": "audit_json",
         }
         for logger_name, logger_details in LOGGING["loggers"].items():
