@@ -20,6 +20,7 @@ def assert_latest_access_granted(
     service,
     scope,
     burgerservicenummers,
+    requestData=None,
     response=None,
 ):
     audit_records = get_audit_records(caplog)
@@ -36,9 +37,11 @@ def assert_latest_access_granted(
     assert audit_log_message.appid == "application_id"
     assert audit_log_message.environment == "brp-kennisgevingen-local"
     assert audit_log_message.needed == [scope]
-    assert audit_log_message.burgerservicenummers == burgerservicenummers
+    assert sorted(audit_log_message.burgerservicenummers) == sorted(burgerservicenummers)
     if response is not None:
         assert audit_log_message.response == response
+    if requestData is not None:
+        assert audit_log_message.requestData == requestData
 
 
 def assert_latest_access_denied(caplog, *, path, granted_scopes, needed_scopes):
@@ -231,7 +234,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990147"],
             response=response.data,
         )
 
@@ -268,7 +271,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["invalid"],
             response=response.data,
         )
 
@@ -292,12 +295,13 @@ class TestSubscriptionsView:
             "burgerservicenummer": "999990019",
             "einddatum": str(today + timedelta(days=30)),
         }
-
+        requestData = {"einddatum": str(data["einddatum"])}
         assert_latest_access_granted(
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
             burgerservicenummers=["999990019"],
+            requestData=requestData,
             response=response.data,
         )
 
@@ -355,7 +359,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990019"],
             response=response.data,
         )
 
@@ -368,7 +372,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990019"],
             response=response.data,
         )
 
@@ -475,7 +479,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990019"],
             response=response.data,
         )
 
@@ -497,7 +501,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990147"],
             response=response.data,
         )
 
@@ -549,7 +553,7 @@ class TestSubscriptionsView:
             caplog,
             service="volgindicaties",
             scope="benk-brp-volgindicaties-api",
-            burgerservicenummers=[],
+            burgerservicenummers=["999990147"],
             response=response.data,
         )
 
@@ -591,7 +595,6 @@ class TestSubscriptionsView:
         caplog.clear()
         response = api_client.put(url, data, HTTP_AUTHORIZATION=f"Bearer {token}")
         assert response.status_code == 200
-
         assert_latest_access_granted(
             caplog,
             service="volgindicaties",
