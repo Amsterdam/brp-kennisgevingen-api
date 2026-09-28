@@ -16,6 +16,10 @@ class IsUserScope(BasePermission):
 
     def has_permission(self, request, view):
         """Check whether the user has all required scopes"""
+        # Allow preflight requests
+        if request.method == "OPTIONS":
+            return True
+
         # When the access is granted, this skips going into the authorization middleware.
         # This is solely done to avoid incorrect log messages of "access granted",
         # because additional checks may still deny access.
