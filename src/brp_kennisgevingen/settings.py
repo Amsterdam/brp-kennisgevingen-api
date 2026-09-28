@@ -246,6 +246,9 @@ if CLOUD_ENV.startswith("azure"):
     AZURE_DATA_COLLECTION_RULE_ID = env.str("AZURE_DATA_COLLECTION_RULE_ID", None)
     AZURE_DATA_COLLECTION_STREAM_NAME = env.str("AZURE_DATA_COLLECTION_STREAM_NAME", None)
 
+    # Set the Managed Idenity Client ID
+    MANAGED_IDENTITY_CLIENT_ID = env.str("MANAGED_IDENTITY_CLIENT_ID", None)
+
     # Configure OpenTelemetry to use Azure Monitor with the specified connection string
     if AZURE_APPI_CONNECTION_STRING is not None:
         configure_azure_monitor(
