@@ -103,6 +103,8 @@ class BaseAPIView(APIView):
 
     def finalize_response(self, request, response, *args, **kwargs):
         """DRF-level finalization for all request types."""
+        if request.method == "OPTIONS":
+            return super().finalize_response(request, response)
 
         if response.status_code not in [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED]:
             burgerservicenummers = self._extract_burgerservicenummers(request, response.data)

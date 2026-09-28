@@ -12,6 +12,9 @@ class JWTAuthentication(BaseAuthentication):
         """Tell REST Framework that we do have an authentication header.
         This makes sure a HTTP 403 (Forbidden) response is given instead of 401 (Unauthorized).
         """
+        if request.method == "OPTIONS":
+            return None, None
+
         if not request.get_token_claims:
             msg = (
                 "The request requires user authentication. The response MUST include a "
