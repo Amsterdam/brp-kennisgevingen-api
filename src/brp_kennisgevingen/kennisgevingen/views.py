@@ -74,6 +74,9 @@ class BaseAPIView(APIView):
     #: The based scopes needed for all requests.
     needed_scopes: set = None
 
+    default_log_fields: dict = {}
+    upn: str = None
+
     def initial(self, request, *args, **kwargs):
         """DRF-level initialization for all request types."""
         self.start_time = time.perf_counter_ns()
