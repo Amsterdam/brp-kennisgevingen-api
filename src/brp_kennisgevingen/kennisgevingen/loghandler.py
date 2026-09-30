@@ -1,3 +1,5 @@
+import base64
+import gzip
 import json
 import logging
 
@@ -37,7 +39,19 @@ class BRPAuditLogHandler(logging.Handler):
         logs = [json.loads(self.format(r)) for r in record]
 
         # Add logSize to each log, so BenK can use the gzippedResponse for large logs
-        logs = [{**log, "logSize": len(json.dumps(log).encode("utf-8"))} for log in logs]
+        for log in logs:
+            log["logSize"] = len(json.dumps(log).encode("utf-8"))
+
+            # Gzip the response and burgerservicenummers to be able to process large logs in Azure
+            if "burgerservicenummers" in log:
+                log["burgerservicenummersGzip"] = base64.b64encode(
+                    gzip.compress(json.dumps(log["burgerservicenummers"]).encode("utf-8"))
+                ).decode("utf-8")
+            if "response" in log:
+                log["responseGzip"] = base64.b64encode(
+                    gzip.compress(json.dumps(log["response"]).encode("utf-8"))
+                ).decode("utf-8")
+
         try:
             self._client.upload(
                 rule_id=self.rule_id,
