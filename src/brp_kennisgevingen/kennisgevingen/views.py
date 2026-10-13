@@ -444,7 +444,30 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
         return queryset
 
 
-# @extend_schema_view(get=schema.list_bsn_updates_schema)
+@extend_schema_view(get=schema.list_new_young_residents_schema)
+class NewYoungResidentsListAPIView(UpdatesAPIBaseView):
+    """
+    Request a list of `burgerservicenummers` of new residents under 23 years of age.
+    """
+
+    needed_scopes: set = {"benk-brp-jeugd-van-tegenwoordig-api"}
+    queryset = NewResident.objects.all()
+    input_serializer = UpdatesInputSerializer
+    service_log_id = "nieuwe-jonge-ingezetenen"
+    max_age: int = 23
+
+    def filter_queryset(self, queryset):
+        query_serializer = self._validate_input_serializer(self.request.query_params)
+        queryset = super().filter_queryset(queryset)
+
+        filter_kwargs = {
+            "birthdate__gte": query_serializer.validated_data["vanaf"]
+            - relativedelta(years=self.max_age)
+        }
+
+        return queryset.filter(**filter_kwargs)
+
+
 class BSNChangesListAPIView(SubscriptionAppIDFilterMixin, UpdatesAPIBaseView):
     """
     Request a list of `burgerservicenummers` that changed into new `burgerservicenummers`.

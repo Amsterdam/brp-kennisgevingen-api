@@ -21,6 +21,11 @@ urlpatterns = [
     path(
         "v1/nieuwe-ingezetenen", views.NewResidentsListAPIView.as_view(), name="new-residents-list"
     ),
+    path(
+        "v1/jeugd-van-tegenwoordig",
+        views.NewYoungResidentsListAPIView.as_view(),
+        name="new-young-residents-list",
+    ),
     path("v1/bsn-wijzigingen", views.BSNChangesListAPIView.as_view(), name="bsn-changes-list"),
     path(
         "v1/schema",

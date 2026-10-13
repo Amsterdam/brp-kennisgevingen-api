@@ -340,6 +340,28 @@ list_new_residents_schema = extend_schema(
     tags=["Raadplegen wijzigingen"],
 )
 
+
+list_new_young_residents_schema = extend_schema(
+    description="Vraag een lijst op met burgerservicenummers van nieuwe ingezetenen tot 23 jaar "
+    "van de Gemeente Amsterdam.",
+    summary="Raadpleeg nieuwe ingezetenen tot 23 jaar van de Gemeente Amsterdam.",
+    parameters=[
+        OpenApiParameter(
+            name="vanaf",
+            description="Alleen personen waarbij gegevens zijn gewijzigd op of na "
+            "deze datum worden geleverd.",
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+            required=True,
+        ),
+    ],
+    responses={
+        200: UpdatesSerializer,
+        **default_error_responses_with_bad_request_start_date,
+    },
+    tags=["Raadplegen wijzigingen"],
+)
+
 list_bsn_updates_schema = extend_schema(
     description="Vraag een lijst op met burgerservicenummers die gewijzigd zijn van de "
     "Gemeente Amsterdam.",
