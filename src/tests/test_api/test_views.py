@@ -111,6 +111,32 @@ class TestBaseView:
             needed_scopes=["benk-brp-volgindicaties-api"],
         )
 
+    @pytest.mark.django_db
+    def test_invalid_accept_header(self, api_client, caplog):
+        """Prove that an invalid accept header is handled."""
+        url = reverse("subscriptions-list")
+        granted_scopes = ["benk-brp-volgindicaties-api"]
+        token = build_jwt_token(granted_scopes)
+        response = api_client.get(
+            url, HTTP_AUTHORIZATION=f"Bearer {token}", headers={"Accept": "application/xml"}
+        )
+        assert response.status_code == 406
+        assert response.data == {
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.6",
+            "title": "Could not satisfy the request Accept header.",
+            "status": 406,
+            "detail": "",
+            "code": "notAcceptable",
+            "instance": "/kennisgevingen/v1/volgindicaties",
+        }
+        assert_latest_access_granted(
+            caplog,
+            service="volgindicaties-list",
+            scope="benk-brp-volgindicaties-api",
+            burgerservicenummers=[],
+            response=response.data,
+        )
+
 
 class TestSubscriptionsView:
 

@@ -82,17 +82,16 @@ class BaseAPIView(APIView):
         self.start_time = time.perf_counter_ns()
         self.start_date = now()
 
-        # Perform authorization, permission checks and throttles.
-        super().initial(request, *args, **kwargs)
-
-        # Options requests do not have a token in the header, so we'll return early
-        if request.method == "OPTIONS":
-            return
-
-        # Token is validated, extract token scopes that are set by the middleware
-        self.user_scopes = set(request.get_token_scopes)
-        self.upn = request.get_token_claims.get("email", request.get_token_subject)
-        self.appid = request.get_token_claims.get("appid")
+        # Try to get token information before the initial checks, so we can log the request
+        # even if it fails.
+        if request.get_token_scopes:
+            self.user_scopes = set(request.get_token_scopes)
+            self.upn = request.get_token_claims.get("email", request.get_token_subject)
+            self.appid = request.get_token_claims.get("appid")
+        else:
+            self.user_scopes = set()
+            self.upn = None
+            self.appid = None
 
         # request.data is only available in initial(), not in setup()
         self.default_log_fields = {
@@ -103,6 +102,9 @@ class BaseAPIView(APIView):
         }
         if self.appid:
             self.default_log_fields["appid"] = self.appid
+
+        # Perform authorization, permission checks and throttles.
+        super().initial(request, *args, **kwargs)
 
     def finalize_response(self, request, response, *args, **kwargs):
         """DRF-level finalization for all request types."""
