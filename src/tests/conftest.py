@@ -131,7 +131,7 @@ def subscription_past() -> Subscription:
 def new_residents() -> list[NewResident]:
     """
     Creates four new residents:
-    - Two with an inserted_at set, one of them has a birthdate set
+    - Two with an inserted_at set, two of them have a birthdate set, one < 23 and one > 23
     - One without an inserted_at set
     - One with an inserted_at in the future
     """
@@ -140,7 +140,7 @@ def new_residents() -> list[NewResident]:
     new_residents = [
         {
             "bsn": "999990019",
-            "birthdate": None,
+            "birthdate": today - relativedelta(years=25),
             "inserted_at": today - timedelta(days=30),
         },
         {

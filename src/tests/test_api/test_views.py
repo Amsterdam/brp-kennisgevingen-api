@@ -910,6 +910,37 @@ class TestUpdateViews:
         )
 
     @pytest.mark.django_db
+    def test_new_young_resident(self, api_client, new_residents, caplog):
+        """
+        Two new resident within the search window. One has an age of 10. We should
+        be able to filter this record without an additional parameter. This endpoint
+        was added to eliminate the need for the maxLeeftijd parameter and will always return
+        the new residents with an age of 23 or younger.
+        """
+        url = reverse("new-young-residents-list")
+        start_date = timezone.now().date() - timedelta(days=40)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-jeugd-van-tegenwoordig-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data["burgerservicenummers"]) == 1
+
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-jonge-ingezetenen",
+            scope="benk-brp-jeugd-van-tegenwoordig-api",
+            burgerservicenummers=response.data["burgerservicenummers"],
+            response=response.data,
+        )
+
+    @pytest.mark.django_db
     def test_bsn_changes_incorrect_scope(self, api_client, subscriptions, bsn_changes, caplog):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
