@@ -22,8 +22,8 @@ sync:                                  ## Install packages, remove unmentioned p
 
 .PHONY: requirements
 requirements: requirements.in requirements_dev.in  ## Re-generate the requirements/base.txt file for pip.
-	pip-compile -v --generate-hashes --resolver=legacy --output-file requirements.txt requirements.in
-	pip-compile -v --generate-hashes --resolver=legacy --output-file requirements_dev.txt requirements_dev.in
+	pip-compile -v --generate-hashes --output-file requirements.txt requirements.in
+	pip-compile -v --generate-hashes --output-file requirements_dev.txt requirements_dev.in
 
 .PHONY: upgrade
 upgrade:                               ## Tool to upgrade the backend dependencies.
