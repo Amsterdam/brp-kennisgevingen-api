@@ -2,7 +2,7 @@ Django == 5.2.18
 django-environ == 0.14.0
 django-cors-headers == 4.9.0
 django-healthchecks == 1.5.0
-datapunt-authorization-django == 3.0.0
+datapunt-authorization-django == 3.1.0
 djangorestframework == 3.18.3
 drf-spectacular == 0.30.0
 psycopg2==2.9.13
@@ -13,8 +13,9 @@ whitenoise == 6.12.0
 
 # Monitoring
 azure-monitor-ingestion == 1.1.0
-azure-monitor-opentelemetry == 1.8.9
+azure-monitor-opentelemetry == 1.8.11
 azure-identity == 1.26.0
+opentelemetry-api == 1.45.1
 uwsgitop == 0.12
 uwsgi-readiness-check == 0.2.0
 
