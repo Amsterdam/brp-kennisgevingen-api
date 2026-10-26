@@ -1,9 +1,9 @@
-Django == 5.2.17
+Django == 5.2.18
 django-environ == 0.14.0
 django-cors-headers == 4.9.0
 django-healthchecks == 1.5.0
 datapunt-authorization-django == 3.0.0
-djangorestframework == 3.18.1
+djangorestframework == 3.18.3
 drf-spectacular == 0.30.0
 psycopg2==2.9.13
 python-json-logger==4.2.0
