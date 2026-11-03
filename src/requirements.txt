@@ -39,9 +39,9 @@ azure-core-tracing-opentelemetry==1.0.0b13 \
     --hash=sha256:4dacd3a9f117f11f98e89305e161c951b8df85b984f3b56130614de9cd9887f9 \
     --hash=sha256:6cb2f8dfd5dee6c11843db0205fc92e2434e1a272c169c953afe92483aafc7eb
     # via azure-monitor-opentelemetry
-azure-identity==1.26.0 \
-    --hash=sha256:3c60d9682b3ac01507388d474cb5a5ffbe54152a96b6cdcaa7013da9315cf186 \
-    --hash=sha256:61b4538b87df10d2d6d44b77cd5ea28a8929fd4929d58b45bf3f230f7daba02e
+azure-identity==1.27.0 \
+    --hash=sha256:6a4c50e25e8e9a47b324a95ad024897e56cb3c6241e0094e93b126a2bf71edc5 \
+    --hash=sha256:92fd2a93c0d2f777dac6c04e5fd7d5734f6643582b983544ef66b4575844e46d
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
@@ -430,9 +430,9 @@ django-environ==0.14.0 \
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
-django-healthchecks==1.5.0 \
-    --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
-    --hash=sha256:25eb021a4a94240b28d996e82775ad6c3b392a2b262360b965a24b88fcfad78d
+django-healthchecks==1.6.0 \
+    --hash=sha256:270d03127552f5f8dc962305b5e04beb053b5cdc66e9b8f1688089f177494e0a \
+    --hash=sha256:78ea78d6f52ac7a2e815af2d633f62cb23d4beec35db90ae2b97bbb6c2997e05
     # via -r requirements.in
 djangorestframework==3.18.3 \
     --hash=sha256:446a9b352e7eff630421ab3f2328bd2401b109a9470afa4a31189994911ed030 \
@@ -807,9 +807,9 @@ pyjwt[crypto]==2.15.0 \
     # via
     #   msal
     #   pyjwt
-pytest==9.1.1 \
-    --hash=sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313 \
-    --hash=sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c
+pytest==9.2.0 \
+    --hash=sha256:07acdcf88ec174f907dc01af70bf52d49b014bbab03faeeade31c96b18c2e588 \
+    --hash=sha256:97c4f3b1f3c7414aa36465e09b8220f1d03627993bd51b1282e193753c80557b
     # via
     #   -r requirements.in
     #   pytest-cov
