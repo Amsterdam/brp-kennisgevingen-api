@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run when INITIALIZE_DB parameter is set and migrations are available.
-if ! uv run src/manage.py migrate --check && "$INITIALIZE_DB" = "true";
+if ! python src/manage.py migrate --check && "$INITIALIZE_DB" = "true";
 then
-    uv run src/manage.py migrate;
+    python src/manage.py migrate;
 fi

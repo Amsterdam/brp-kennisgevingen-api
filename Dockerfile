@@ -3,6 +3,9 @@ MAINTAINER datapunt@amsterdam.nl
 
 WORKDIR /app
 
+COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /bin/
+
+
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     libpq-dev \
@@ -13,26 +16,10 @@ COPY pyproject.toml uv.lock ./
 
 ENV CC=/usr/bin/gcc \
     UV_PROJECT_ENVIRONMENT=/app/.venv
-# Install uv and dependencies from lockfile
-RUN pip install --no-cache-dir uv
 
 # Verify the compiler in the same stage and immediately before uv sync
 
-RUN echo "=== UV VERSION ===" && uv --version && \
-    echo "=== PROJECT ENVIRONMENT ===" && echo "$UV_PROJECT_ENVIRONMENT" && \
-    echo "=== PROJECT FILES ===" && ls -la /app && \
-    uv sync --frozen --no-dev --no-install-project
-RUN echo "=== APP DIRECTORY ==="; \
-    ls -la /app; \
-    echo "=== VENV DIRECTORY ==="; \
-    if [ -d /app/.venv ]; then \
-        ls -la /app/.venv; \
-        ls -la /app/.venv/bin/; \
-    else \
-        echo "/app/.venv DOES NOT EXIST"; \
-    fi; \
-    echo "=== POSSIBLE VIRTUAL ENVIRONMENTS ==="; \
-    find /app -maxdepth 4 -name pyvenv.cfg -print
+RUN uv sync --frozen --no-install-project --all-groups
 
 # Start runtime image,
 FROM python:3.14-slim-trixie

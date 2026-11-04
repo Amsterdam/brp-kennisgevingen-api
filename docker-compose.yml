@@ -43,6 +43,7 @@ services:
       CLOUD_ENV: "${CLOUD_ENV:-local}"
       DJANGO_DEBUG: 1
       INITIALIZE_DB: "${INITIALIZE_DB:-true}"
+      PYTHONPATH: /app/src
     volumes:
       - ./src:/app/src
     command: >
