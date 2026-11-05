@@ -43,6 +43,7 @@ COPY . ./
 # Have some defaults so the container is easier to start
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app/src" \
     DJANGO_SETTINGS_MODULE=brp_kennisgevingen.settings \
     DJANGO_DEBUG=false \
     UWSGI_HTTP_SOCKET=:8000 \
