@@ -17,6 +17,7 @@ dependencies = [
     "whitenoise==6.12.0",
     "jwcrypto==1.6.1",
     "uwsgi==2.0.31",
+    "oauthlib == 4.0.1",
 
     # Monitoring
     "azure-monitor-ingestion==1.1.0",
@@ -79,7 +80,7 @@ plugins = ["django_coverage_plugin"]
 # ==== ruff ====
 [tool.ruff]
 line-length = 99
-target-version = "py314"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
