@@ -12,9 +12,9 @@ install:                               ## Perform all install steps
 	if ! command -v uv >/dev/null 2>&1; \
 		then echo "uv not found, installing..." \
 		&& curl -LsSf https://astral.sh/uv/install.sh | sh; \
-		fi
-		uv sync
-		uv run pre-commit install
+	fi
+	uv sync
+	uv run pre-commit install
 
 ##
 ## Package management:
