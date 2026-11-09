@@ -9,28 +9,20 @@ help:
 
 .PHONY: install
 install:                               ## Perform all install steps
-	pip --require-virtualenv install -r requirements_dev.txt
-	pre-commit install
-
-.PHONY: sync
-sync:                                  ## Install packages, remove unmentioned packages
-	pip-sync requirements.txt requirements_dev.txt
+	if ! command -v uv >/dev/null 2>&1; \
+		then echo "uv not found, installing..." \
+		&& curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	fi
+	uv sync
+	uv run pre-commit install
 
 ##
 ## Package management:
 ##
 
-.PHONY: requirements
-requirements: requirements.in requirements_dev.in  ## Re-generate the requirements/base.txt file for pip.
-	pip-compile -v --generate-hashes --output-file requirements.txt requirements.in
-	pip-compile -v --generate-hashes --output-file requirements_dev.txt requirements_dev.in
-
 .PHONY: upgrade
 upgrade:                               ## Tool to upgrade the backend dependencies.
-	pur --patch=Django -r requirements.in
-	pur --no-recursive -r requirements_dev.in
-	pip-compile -v --generate-hashes --upgrade --output-file requirements.txt requirements.in
-	pip-compile -v --generate-hashes --upgrade --output-file requirements_dev.txt requirements_dev.in
+	uv sync --upgrade
 
 ##
 ## Testing:
@@ -38,36 +30,35 @@ upgrade:                               ## Tool to upgrade the backend dependenci
 
 .PHONY: test
 test:                                  ## Run the test-suite.
-	pytest --reuse-db --nomigrations -vs .
+	uv run pytest --reuse-db --nomigrations -vs .
 
 .PHONY: test
 retest:                                ## Run the failed tests again.
-	pytest --reuse-db --nomigrations -vvs --lf .
+	uv run pytest --reuse-db --nomigrations -vvs --lf .
 
 .PHONY: coverage
 coverage:
-	py.test --reuse-db --nomigrations --cov --cov-report=term-missing
+	uv run pytest --reuse-db --nomigrations --cov --cov-report=term-missing
 
 ##
 ## Development tools:
 ##
 
 format:                                ## Fix code-formatting of all files.
-	black .
-	ruff check --fix-only .
-#	pre-commit run -a
+	uv run ruff check --fix-only .
+#	uv run pre-commit run -a
 
 lint:                                  ## Report linting errors for all files
-	ruff check .
+	uv run ruff check .
 
 ##
 ## Fixtures:
 ##
 
 migrate:
-	./manage.py migrate
+	uv run src/manage.py migrate
 
 load_fixtures:  migrate                  ## Load initial data into database by django fixtures
-	./manage.py loaddata kennisgevingen.json
+	uv run src/manage.py loaddata kennisgevingen.json
 
 ##

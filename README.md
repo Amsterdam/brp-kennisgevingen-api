@@ -29,15 +29,14 @@ Navigate to `localhost:8096`.
 Create a virtualenv:
 
 ```shell
-python3 -m venv venv
-source venv/bin/activate
+uv venv
+source .venv/bin/activate
 ```
 
 Install all packages in it:
 ```shell
-pip install -U wheel pip
-cd src/
-make install  # installs src/requirements_dev.txt
+cd src
+make install  # alternatively you can use uv sync
 ```
 
 Start the Django application:
@@ -45,7 +44,7 @@ Start the Django application:
 export PUB_JWKS="$(cat jwks_test.json)"
 export DJANGO_DEBUG=true
 
-./manage.py runserver localhost:8000
+uv run ./src/manage.py runserver localhost:8000
 ```
 
 ## Environment Settings
@@ -83,13 +82,13 @@ Run `make` in the `src` folder to have a help-overview of all common developer t
 
 ## Package Management
 
-The packages are managed with *pip-compile*.
+Packages are managed with uv and locked in uv.lock.
 
-To add a package, update the `requirements.in` file and run `make requirements`.
-This will update the "lockfile" aka `requirements.txt` that's used for pip installs.
+To add a package, run `uv add <package-name>`. To add a development dependency: `uv add --dev <package-name>`.
+This updates both pyproject.toml and the uv.lock file.
 
-To upgrade all packages, run `make upgrade`, followed by `make install` and `make test`.
-Or at once if you feel lucky: `make upgrade install test`.
+To upgrade all packages, run `uv lock --upgrade` or `make upgrade`.
+Verify that everything still works with `uv sync && uv run pytest` or `make test`.
 
 ## Environment Settings
 
@@ -97,14 +96,8 @@ Consider using *direnv* for automatic activation of environment variables.
 It automatically sources an ``.envrc`` file when you enter the directory.
 This file should contain all lines in the `export VAR=value` format.
 
-In a similar way, *pyenv* helps to install the exact Python version,
-and will automatically activate the virtualenv when a `.python-version` file is found:
-
-```shell
-pyenv install 3.13.1
-pyenv virtualenv 3.13.1 brp-kennisgevingen-api
-echo brp-kennisgevingen-api > .python-version
-```
+In a similar way, *uv* helps to install the exact Python version,
+and will automatically activate a virtualenv and use it when you run commands using `uv run`.
 
 ## Test the application with mock data
 
@@ -112,7 +105,6 @@ To be able to test the functionality of the API we've included some initial mock
 test some scenarios. First load the fixtures using:
 
 ```shell
-cd src
 make load_fixtures
 ```
 

@@ -19,9 +19,7 @@ services:
     command: [ "postgres", "-c", "log_statement=all" ]
   web:
     build:
-      context: src/
-      args:
-        PIP_REQUIREMENTS: requirements_dev.txt
+      context: .
     ports:
       - "8096:8000"
     links:
@@ -45,8 +43,9 @@ services:
       CLOUD_ENV: "${CLOUD_ENV:-local}"
       DJANGO_DEBUG: 1
       INITIALIZE_DB: "${INITIALIZE_DB:-true}"
+      PYTHONPATH: /app/src
     volumes:
-      - ./src:/app
+      - ./src:/app/src
     command: >
-      /bin/bash -c "sh /app/initialize_db.sh
+      /bin/bash -c "sh /app/src/initialize_db.sh
       && uwsgi --py-auto-reload=1 --enable-threads --lazy-apps --buffer-size=65535"

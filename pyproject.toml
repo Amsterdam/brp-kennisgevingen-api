@@ -1,9 +1,62 @@
+[project]
+name = "brp-kennisgevingen-api"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "Django==5.2.18",
+    "django-environ==0.14.0",
+    "django-cors-headers==4.9.0",
+    "django-healthchecks==1.6.0",
+    "datapunt-authorization-django==3.1.0",
+    "djangorestframework==3.18.3",
+    "drf-spectacular==0.30.0",
+    "psycopg2-binary==2.9.13",
+    "python-json-logger==4.2.0",
+    "python-dateutil==3.0.0",
+    "requests==2.34.2",
+    "whitenoise==6.12.0",
+    "jwcrypto==1.6.1",
+    "uwsgi==2.0.31",
+    "oauthlib == 4.0.1",
+
+    # Monitoring
+    "azure-monitor-ingestion==1.1.0",
+    "azure-monitor-opentelemetry==1.8.11",
+    "azure-identity==1.27.0",
+    "opentelemetry-api==1.45.1",
+    "uwsgitop==0.12",
+    "uwsgi-readiness-check==0.2.0",
+]
+
+[dependency-groups]
+dev = [
+    # Testing
+    "pytest==9.2.0",
+    "pytest-django==4.14.0",
+    "pytest-cov==7.1.0",
+    "python-owasp-zap-v2.4==0.1.0",
+    "requests-mock==1.12.1",
+    "pytest-sugar==1.1.1",
+    "termcolor==3.3.0",
+
+    # Packaging
+    "pur==7.4.0",
+
+    # Linting
+    "pre-commit==4.7.0",
+    "ruff==0.17.3",
+
+    # Debugging
+    "django-debug-toolbar==8.0.0",
+    "django-extensions==4.1",
+]
+
 # ==== pytest ====
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 minversion = "6.0"
 django_find_project = false
-pythonpath = "src/"
+pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = [
     "--nomigrations",
@@ -24,16 +77,10 @@ source = ["gisserver"]
 omit = ["*/migrations/*.py", "*/test*.py", "*/tests/*"]
 plugins = ["django_coverage_plugin"]
 
-
-# ==== black ====
-[tool.black]
-line-length = 99
-target-version = ['py38']
-
 # ==== ruff ====
 [tool.ruff]
 line-length = 99
-target-version = "py38"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -83,14 +130,16 @@ ignore = [
 allow-dict-calls-with-keyword-arguments = true
 
 [tool.ruff.lint.flake8-gettext]
-extend-function-names = ["gettext_lazy", "ngettext_lazy", "pgettext", "pgettext_lazy", "npgettext", "npgettext_lazy"]
+extend-function-names = [
+    "gettext_lazy", "ngettext_lazy", "pgettext",
+    "pgettext_lazy", "npgettext", "npgettext_lazy"
+]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.utils.timezone.make_aware".msg = "There is no need for make_aware(), pass tzinfo directly."
 
 [tool.ruff.lint.isort]
 known-first-party = ["brp_kennisgevingen", "tests"]
-#required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
