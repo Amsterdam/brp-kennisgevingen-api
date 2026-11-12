@@ -920,6 +920,8 @@ class TestUpdateViews:
         The new resident who is exactly 27 years on the vanaf date will not be returned
         """
         url = reverse("new-young-residents-list")
+        # The vanaf date is 40 days in the past. The new resident who is exactly 27 years of age
+        # on this date should not be returned (bsn: 999990267)
         start_date = timezone.now().date() - timedelta(days=40)
         query_params = {
             "vanaf": start_date,
@@ -949,6 +951,8 @@ class TestUpdateViews:
         The new resident who is one day before 27 years of age today should be returned
         """
         url = reverse("new-young-residents-list")
+        # The vanaf date is 41 days in the past. The new resident who is exactly 26 years and 364
+        # days of age should be returned (bsn: 999990267)
         start_date = timezone.now().date() - timedelta(days=41)
         query_params = {
             "vanaf": start_date,
