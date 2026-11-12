@@ -130,8 +130,9 @@ def subscription_past() -> Subscription:
 @pytest.fixture()
 def new_residents() -> list[NewResident]:
     """
-    Creates four new residents:
-    - Two with an inserted_at set, one of them has a birthdate set
+    Creates five new residents:
+    - Four with an inserted_at set
+    - Three of them have a birthdate set, one = 27, one < 27 and one > 27
     - One without an inserted_at set
     - One with an inserted_at in the future
     """
@@ -140,7 +141,12 @@ def new_residents() -> list[NewResident]:
     new_residents = [
         {
             "bsn": "999990019",
-            "birthdate": None,
+            "birthdate": today - relativedelta(years=28),
+            "inserted_at": today - timedelta(days=30),
+        },
+        {
+            "bsn": "999990267",
+            "birthdate": today - relativedelta(years=27) - timedelta(days=40),
             "inserted_at": today - timedelta(days=30),
         },
         {

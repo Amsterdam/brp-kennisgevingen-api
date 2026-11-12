@@ -910,6 +910,73 @@ class TestUpdateViews:
         )
 
     @pytest.mark.django_db
+    def test_new_young_resident_27_years(self, api_client, new_residents, caplog):
+        """
+        Three new resident within the search window. One has an age of 10. We should
+        be able to filter this record without an additional parameter. This endpoint
+        was added to eliminate the need for the maxLeeftijd parameter and will always return
+        the new residents with an age of 27 or younger on the vanaf date.
+
+        The new resident who is exactly 27 years on the vanaf date will not be returned
+        """
+        url = reverse("new-young-residents-list")
+        # The vanaf date is 40 days in the past. The new resident who is exactly 27 years of age
+        # on this date should not be returned (bsn: 999990267)
+        start_date = timezone.now().date() - timedelta(days=40)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-nieuwe-ingezetenen-tot-27-jaar-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data["burgerservicenummers"]) == 1
+        assert "999990267" not in response.data["burgerservicenummers"]
+
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-ingezetenen-tot-27-jaar",
+            scope="benk-brp-nieuwe-ingezetenen-tot-27-jaar-api",
+            burgerservicenummers=response.data["burgerservicenummers"],
+            response=response.data,
+        )
+
+    @pytest.mark.django_db
+    def test_new_young_resident_26_year(self, api_client, new_residents, caplog):
+        """
+        The new resident who is one day before 27 years of age today should be returned
+        """
+        url = reverse("new-young-residents-list")
+        # The vanaf date is 41 days in the past. The new resident who is exactly 26 years and 364
+        # days of age should be returned (bsn: 999990267)
+        start_date = timezone.now().date() - timedelta(days=41)
+        query_params = {
+            "vanaf": start_date,
+        }
+        token = build_jwt_token(
+            [
+                "benk-brp-nieuwe-ingezetenen-tot-27-jaar-api",
+            ]
+        )
+        response = api_client.get(url, data=query_params, HTTP_AUTHORIZATION=f"Bearer {token}")
+
+        assert response.status_code == 200
+        assert len(response.data["burgerservicenummers"]) == 2
+        assert "999990267" in response.data["burgerservicenummers"]
+
+        assert_latest_access_granted(
+            caplog,
+            service="nieuwe-ingezetenen-tot-27-jaar",
+            scope="benk-brp-nieuwe-ingezetenen-tot-27-jaar-api",
+            burgerservicenummers=response.data["burgerservicenummers"],
+            response=response.data,
+        )
+
+    @pytest.mark.django_db
     def test_bsn_changes_incorrect_scope(self, api_client, subscriptions, bsn_changes, caplog):
         url = reverse("bsn-changes-list")
         start_date = timezone.now().date() - timedelta(days=30)
