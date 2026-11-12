@@ -447,14 +447,14 @@ class NewResidentsListAPIView(UpdatesAPIBaseView):
 @extend_schema_view(get=schema.list_new_young_residents_schema)
 class NewYoungResidentsListAPIView(UpdatesAPIBaseView):
     """
-    Request a list of `burgerservicenummers` of new residents under 23 years of age.
+    Request a list of `burgerservicenummers` of new residents under 27 years of age.
     """
 
     needed_scopes: set = {"benk-brp-nieuwe-ingezetenen-tot-27-jaar-api"}
     queryset = NewResident.objects.all()
     input_serializer = UpdatesInputSerializer
     service_log_id = "nieuwe-ingezetenen-tot-27-jaar"
-    max_age: int = 27
+    MAX_AGE: int = 27
 
     def filter_queryset(self, queryset):
         query_serializer = self._validate_input_serializer(self.request.query_params)
@@ -462,7 +462,7 @@ class NewYoungResidentsListAPIView(UpdatesAPIBaseView):
 
         filter_kwargs = {
             "birthdate__gt": query_serializer.validated_data["vanaf"]
-            - relativedelta(years=self.max_age)
+            - relativedelta(years=self.MAX_AGE)
         }
 
         return queryset.filter(**filter_kwargs)

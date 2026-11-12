@@ -342,9 +342,9 @@ list_new_residents_schema = extend_schema(
 
 
 list_new_young_residents_schema = extend_schema(
-    description="Vraag een lijst op met burgerservicenummers van nieuwe ingezetenen tot 23 jaar "
+    description="Vraag een lijst op met burgerservicenummers van nieuwe ingezetenen tot 27 jaar "
     "van de Gemeente Amsterdam.",
-    summary="Raadpleeg nieuwe ingezetenen tot 23 jaar van de Gemeente Amsterdam.",
+    summary="Raadpleeg nieuwe ingezetenen tot 27 jaar van de Gemeente Amsterdam.",
     parameters=[
         OpenApiParameter(
             name="vanaf",
