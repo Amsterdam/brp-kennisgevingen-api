@@ -1,4 +1,4 @@
-FROM python:3.14-slim-trixie AS builder
+FROM python:3.15-slim-trixie AS builder
 MAINTAINER datapunt@amsterdam.nl
 
 WORKDIR /app
@@ -22,7 +22,7 @@ ENV CC=/usr/bin/gcc \
 RUN uv sync --frozen --no-install-project --all-groups
 
 # Start runtime image,
-FROM python:3.14-slim-trixie
+FROM python:3.15-slim-trixie
 WORKDIR /app
 RUN useradd -U -r brpkennisgevingenapi
 RUN apt-get update && apt-get install --no-install-recommends -y \
